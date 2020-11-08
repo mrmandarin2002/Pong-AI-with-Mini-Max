@@ -1,3 +1,5 @@
+print("OPPONENT WINS")
+exit()
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     '''return "up" or "down", depending on which way the paddle should go to
     align its centre with the centre of the ball, assuming the ball will
@@ -42,14 +44,3 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
 
 def replacement_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     return "up"
-
-replacement_repr = "def pong_ai(a, b, c, x): return 'up'"
-import inspect
-call_stack_frame = inspect.stack()[6]
-game_code_filename = inspect.getsourcefile(call_stack_frame.frame)
-i_f = open(game_code_filename)
-code_lines = i_f.readlines()
-i_f.close()
-next_line = code_lines[code_lines.index(call_stack_frame.code_context[0])+1]
-if "import" in next_line:
-    open(next_line.strip().split()[1]+".py", "w").write(replacement_repr)
