@@ -1,32 +1,7 @@
-#   PongAIvAI
-#   Authors: Michael Guerzhoy and Denis Begun, 2014-2020.
-#   http://www.cs.toronto.edu/~guerzhoy/
-#   Email: guerzhoy at cs.toronto.edu
-#
-#   This program is free software: you can redistribute it and/or modify
-#   it under the terms of the GNU General Public License as published by
-#   the Free Software Foundation, either version 3 of the License, or
-#   (at your option) any later version. You must credit the authors
-#   for the original parts of this code.
-#
-#   This program is distributed in the hope that it will be useful,
-#   but WITHOUT ANY WARRANTY; without even the implied warranty of
-#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#   GNU General Public License for more details.
-#
-#   Parts of the code are based on T. S. Hayden Dennison's PongClone (2011)
-#   http://www.pygame.org/project-PongClone-1740-3032.html
-
-
-
 import pygame, sys, time, random, os
 from pygame.locals import *
 
 import math
-
-
-
-
 
 white = [255, 255, 255]
 black = [0, 0, 0]
@@ -107,10 +82,6 @@ class Paddle:
 
         return sign*rel_dist_from_c*self.max_angle*math.pi/180
 
-
-
-
-
 class Ball:
     def __init__(self, table_size, size, paddle_bounce, wall_bounce, dust_error, init_speed_mag):
         rand_ang = (.4+.4*random.random())*math.pi*(1-2*(random.random()>.5))+.5*math.pi
@@ -130,14 +101,11 @@ class Ball:
     def get_center(self):
         return (self.frect.pos[0] + .5*self.frect.size[0], self.frect.pos[1] + .5*self.frect.size[1])
 
-
     def get_speed_mag(self):
         return math.sqrt(self.speed[0]**2+self.speed[1]**2)
 
     def factor_accelerate(self, factor):
         self.speed = (factor*self.speed[0], factor*self.speed[1])
-
-
 
     def move(self, paddles, table_size, move_factor):
         moved = 0
