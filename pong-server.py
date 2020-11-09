@@ -38,6 +38,7 @@ class Game_Client_Thread(threading.Thread):
                 #print(data)
             except:
                 print("AN ERROR HAS OCCURED!")
+                break
 
     def kill(self):
         try:
@@ -74,6 +75,7 @@ class Controller_Client_Thread(threading.Thread):
                             self.conn.send(str.encode("ALIVE"))
             except:
                 print("????")
+                break
 
 while True:
     conn, addr = s.accept()

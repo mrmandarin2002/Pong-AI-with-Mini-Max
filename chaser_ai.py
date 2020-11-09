@@ -42,7 +42,6 @@ class game_client_thread(threading.Thread):
         self.network = Network()
 
     def run(self):
-        print("WE IN BOIS")
         while True:
             try:
                 data = self.network.conn.recv(2048).decode(FORMAT)
@@ -64,7 +63,6 @@ class game_client_thread(threading.Thread):
 
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
-    print("IN")
     global client_thread
     if(client_thread == None):
         client_thread = game_client_thread()
@@ -80,8 +78,6 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
         if obj[0] == "f_locals":
             obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
     '''
-
-    print("RETURNING")
     if paddle_frect.pos[1]+paddle_frect.size[1]/2 < ball_frect.pos[1]+ball_frect.size[1]/2:
         return "down"
     else:
