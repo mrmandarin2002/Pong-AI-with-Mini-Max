@@ -35,6 +35,7 @@ class Game_Client_Thread(threading.Thread):
         while True:
             try:
                 data = self.conn.recv(2048).decode(FORMAT)
+                print(data)
             except:
                 print("AN ERROR HAS OCCURED!")
 
@@ -58,10 +59,12 @@ while True:
     client_type = conn.recv(2048).decode(FORMAT)
     conn.send(str.format(str(thread_cnt)))
     if(client_type == 'game'):
+        print("Connection with game client established!")
         game_clients.append(Game_Client_Thread(thread_cnt, addr, conn))
         game_clients[len(game_clients) - 1].start()
         thread_cnt += 1
     elif(client_type == 'controller'):
+        print("Connection with controller client established!")
         controller_clients.append(Controller_Client_Thread(thread_cnt, addr, conn))
         controller_clients[len(controller_clients) - 1].start()
         thread_cnt += 1

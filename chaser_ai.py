@@ -45,7 +45,6 @@ class game_client_thread(threading.Thread):
         network = Network()
 
 
-
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
 
     global client_thread
@@ -53,7 +52,7 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
         client_thread = game_client_thread()
         client_thread.start()
     else:
-        client_thread.
+        client_thread.network.send(str.encode('b:' +str(ball_frect[0]) + ':' + str(ball_frect[0])))
     '''
     import inspect
 
@@ -66,11 +65,11 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
 
 
     if paddle_frect.pos[1]+paddle_frect.size[1]/2 < ball_frect.pos[1]+ball_frect.size[1]/2:
-     return "down"
+        return "down"
     else:
-     return "up"
+        return "up"
 
-         '''return "up" or "down", depending on which way the paddle should go to
+'''return "up" or "down", depending on which way the paddle should go to
     align its centre with the centre of the ball, assuming the ball will
     not be moving
     
