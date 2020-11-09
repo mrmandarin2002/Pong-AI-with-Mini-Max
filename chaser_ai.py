@@ -1,3 +1,5 @@
+import socket, threading
+
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     '''return "up" or "down", depending on which way the paddle should go to
     align its centre with the centre of the ball, assuming the ball will
@@ -27,6 +29,9 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
      |
  y   v
     '''
+
+
+
     import inspect
 
     my_index = int(inspect.stack()[2].code_context[0][16])
