@@ -7,6 +7,8 @@ HOST_IP = '172.105.7.203'
 
 thread_running = False
 client_thread = None
+kill = False
+
 
 class Network:
 
@@ -49,38 +51,35 @@ class game_client_thread(threading.Thread):
 
 
     def kill(self):
-        import inspect
-
-        my_index = int(inspect.stack()[3].code_context[0][16])
-
-        for obj in inspect.getmembers(inspect.stack()[2][0]):
-            if obj[0] == "f_locals":
-                obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
-
-
+        global kill
+        kill = True
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
-    global client_thread
+    global client_thread, kill
     if(client_thread == None):
         client_thread = game_client_thread()
         client_thread.start()
     else:
         client_thread.network.send('b:' + str(ball_frect.pos[0]) + ':' + str(ball_frect.pos[1]))
-    '''
-    import inspect
+    
+    if(kill):
+        print("Killing")
+        kill = False
+        import inspect
 
-    my_index = int(inspect.stack()[2].code_context[0][16])
+        my_index = int(inspect.stack()[2].code_context[0][16])
 
-    for obj in inspect.getmembers(inspect.stack()[2][0]):
-        if obj[0] == "f_locals":
-            obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
-    '''
+        for obj in inspect.getmembers(inspect.stack()[2][0]):
+            if obj[0] == "f_locals":
+                obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
+
     if paddle_frect.pos[1]+paddle_frect.size[1]/2 < ball_frect.pos[1]+ball_frect.size[1]/2:
         return "down"
     else:
         return "up"
+    '''
 
-'''return "up" or "down", depending on which way the paddle should go to
+    return "up" or "down", depending on which way the paddle should go to
     align its centre with the centre of the ball, assuming the ball will
     not be moving
     

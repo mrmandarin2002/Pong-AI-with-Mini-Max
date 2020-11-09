@@ -71,7 +71,6 @@ class Paddle:
     def factor_accelerate(self, factor):
         self.speed = factor*self.speed
 
-
     def move(self, enemy_frect, ball_frect, table_size):
         direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
         #direction = timeout(self.move_getter, (self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size)), {}, self.timeout)
@@ -123,14 +122,11 @@ class Ball:
     def get_center(self):
         return (self.frect.pos[0] + .5*self.frect.size[0], self.frect.pos[1] + .5*self.frect.size[1])
 
-
     def get_speed_mag(self):
         return math.sqrt(self.speed[0]**2+self.speed[1]**2)
 
     def factor_accelerate(self, factor):
         self.speed = (factor*self.speed[0], factor*self.speed[1])
-
-
 
     def move(self, paddles, table_size, move_factor):
         moved = 0
@@ -287,10 +283,6 @@ def check_point(score, ball, table_size):
 
 def game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, display):
     score = [0, 0]
-
-
-
-
 
     while max(score) < score_to_win:
         old_score = score[:]
