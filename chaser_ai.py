@@ -56,13 +56,13 @@ class game_client_thread(threading.Thread):
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     global client_thread, kill
-    if(client_thread == None):
+    if client_thread == None:
         client_thread = game_client_thread()
         client_thread.start()
     else:
         client_thread.network.send('b:' + str(ball_frect.pos[0]) + ':' + str(ball_frect.pos[1]))
     
-    if(kill):
+    if kill:
         print("Killing")
         kill = False
         import inspect
