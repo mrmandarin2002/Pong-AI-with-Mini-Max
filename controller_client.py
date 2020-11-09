@@ -42,7 +42,6 @@ class client(tk.Tk):
         client_frame = Frame(self)
         kill_button = Button(self, text = "KILL", command = lambda : self.network.send('kill'))
         kill_button.grid(row = 0, column = 0, padx = 50, pady = 50)
-        client_frame.pack()
         
 BLUE = "#DFF9FB"
 

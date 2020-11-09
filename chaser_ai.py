@@ -11,15 +11,15 @@ client_thread = None
 class Network:
 
     def __init__(self):
-        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.host = HOST_IP 
         self.addr = (self.host, PORT)
         self.id = self.connect()
 
     def connect(self):
-        self.client.connect(self.addr)
-        self.client.send(str.encode('game'))
-        received_message = self.client.recv(2048).decode()
+        self.conn.connect(self.addr)
+        self.conn.send(str.encode('game'))
+        received_message = self.conn.recv(2048).decode()
         if(received_message):
             print("Succesfully connected to server!")
         print(received_message)
@@ -31,25 +31,26 @@ class Network:
         :return: str
         """
         try:
-            self.client.send(str.encode(data))
+            self.conn.send(str.encode(data))
         except socket.error as e:
             return str(e)
 
 class game_client_thread(threading.Thread):
 
     def __init__(self):
-        pass
+        threading.Thread.__init__(self)
+        self.network = Network()
 
     def run(self):
-        self.network = Network()
+        print("WE IN BOIS")
         while True:
             try:
-                data = self.conn.recv(2048).decode(FORMAT)
+                data = self.network.conn.recv(2048).decode(FORMAT)
                 print(data)
-                execute("self." + data + "()")
-
-            except:
+                exec("self." + data + "()")
+            except Exception as e:
                 print("AN ERROR HAS OCCURED IN GAME CLIENT THREAD")
+                print(e)
 
     def kill(self):
         import inspect
@@ -61,12 +62,13 @@ class game_client_thread(threading.Thread):
                 obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
 
 
-def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
 
+def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
+    print("IN")
     global client_thread
     if(client_thread == None):
         client_thread = game_client_thread()
-        client_thread.run()
+        client_thread.start()
     else:
         client_thread.network.send('b:' + str(ball_frect.pos[0]) + ':' + str(ball_frect.pos[1]))
     '''
@@ -79,7 +81,7 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
             obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
     '''
 
-
+    print("RETURNING")
     if paddle_frect.pos[1]+paddle_frect.size[1]/2 < ball_frect.pos[1]+ball_frect.size[1]/2:
         return "down"
     else:

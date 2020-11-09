@@ -104,9 +104,6 @@ class Paddle:
         return sign*rel_dist_from_c*self.max_angle*math.pi/180
 
 
-
-
-
 class Ball:
     def __init__(self, table_size, size, paddle_bounce, wall_bounce, dust_error, init_speed_mag):
         rand_ang = (.4+.4*random.random())*math.pi*(1-2*(random.random()>.5))+.5*math.pi
