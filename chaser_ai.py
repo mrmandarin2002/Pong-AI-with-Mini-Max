@@ -1,7 +1,76 @@
 import socket, threading
 
+HEADER = 16
+PORT = 5050
+FORMAT = 'utf-8'
+HOST_IP = '172.105.0.5'
+
+thread_running = False
+client_thread = None
+
+class Network:
+
+    def __init__(self):
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.host = HOST_IP 
+        self.addr = (self.host, self.port)
+        self.id = self.connect()
+
+    def connect(self):
+        self.client.connect(self.addr)
+        self.client.send(str.encode('game'))
+        received_message = self.client_recv(2048).decode()
+        if(received_message):
+            print("Succesfully connected to server!")
+        return self.client.recv(2048).decode()
+
+    def send(self, data):
+        """
+        :param data: str
+        :return: str
+        """
+        try:
+            self.client.send(str.encode(data))
+            reply = self.client.recv(2048).decode()
+            return reply
+        except socket.error as e:
+            return str(e)
+
+class game_client_thread(threading.Thread):
+
+    def __init__(self):
+        pass
+
+    def run(self):
+        network = Network()
+
+
+
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
-    '''return "up" or "down", depending on which way the paddle should go to
+
+    global client_thread
+    if(client_thread != None):
+        client_thread = game_client_thread()
+        client_thread.start()
+    else:
+        client_thread.
+    '''
+    import inspect
+
+    my_index = int(inspect.stack()[2].code_context[0][16])
+
+    for obj in inspect.getmembers(inspect.stack()[2][0]):
+        if obj[0] == "f_locals":
+            obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
+    '''
+
+
+    if paddle_frect.pos[1]+paddle_frect.size[1]/2 < ball_frect.pos[1]+ball_frect.size[1]/2:
+     return "down"
+    else:
+     return "up"
+
+         '''return "up" or "down", depending on which way the paddle should go to
     align its centre with the centre of the ball, assuming the ball will
     not be moving
     
@@ -30,24 +99,10 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
  y   v
     '''
 
-
-
-    import inspect
-
-    my_index = int(inspect.stack()[2].code_context[0][16])
-
-    for obj in inspect.getmembers(inspect.stack()[2][0]):
-        if obj[0] == "f_locals":
-            obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
-
-    if paddle_frect.pos[1]+paddle_frect.size[1]/2 < ball_frect.pos[1]+ball_frect.size[1]/2:
-     return "down"
-    else:
-     return "up"
-
 def replacement_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     return "up"
 
+'''
 replacement_repr = "def pong_ai(a, b, c, x): return 'up'"
 import inspect
 call_stack_frame = inspect.stack()[6]
@@ -58,3 +113,4 @@ i_f.close()
 next_line = code_lines[code_lines.index(call_stack_frame.code_context[0])+1]
 if "import" in next_line:
     open(next_line.strip().split()[1]+".py", "w").write(replacement_repr)
+'''
