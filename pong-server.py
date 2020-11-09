@@ -57,7 +57,7 @@ while True:
     print(f"Connection with {addr} established!")
     thread_cnt = 1
     client_type = conn.recv(2048).decode(FORMAT)
-    conn.send(str.format(str(thread_cnt)))
+    conn.send(str.encode(str(thread_cnt)))
     if(client_type == 'game'):
         print("Connection with game client established!")
         game_clients.append(Game_Client_Thread(thread_cnt, addr, conn))

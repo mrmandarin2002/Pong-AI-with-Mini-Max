@@ -19,7 +19,7 @@ class Network:
     def connect(self):
         self.client.connect(self.addr)
         self.client.send(str.encode('game'))
-        received_message = self.client_recv(2048).decode()
+        received_message = self.client.recv(2048).decode()
         if(received_message):
             print("Succesfully connected to server!")
         return self.client.recv(2048).decode()
