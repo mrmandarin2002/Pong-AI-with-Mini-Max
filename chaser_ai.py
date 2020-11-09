@@ -3,17 +3,17 @@ import socket, threading
 HEADER = 16
 PORT = 5050
 FORMAT = 'utf-8'
-HOST_IP = '172.105.0.5'
+HOST_IP = '172.105.7.203'
 
 thread_running = False
-client_thread = None
+client_thread = []
 
 class Network:
 
     def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.host = HOST_IP 
-        self.addr = (self.host, self.port)
+        self.addr = (self.host, PORT)
         self.id = self.connect()
 
     def connect(self):
@@ -42,17 +42,17 @@ class game_client_thread(threading.Thread):
         pass
 
     def run(self):
-        network = Network()
+        self.network = Network()
 
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
 
     global client_thread
     if(client_thread != None):
-        client_thread = game_client_thread()
-        client_thread.start()
+        client_thread.append(game_client_thread())
+        client_thread[0].run()
     else:
-        client_thread.network.send(str.encode('b:' +str(ball_frect[0]) + ':' + str(ball_frect[0])))
+        client_thread[0].network.send(str.encode('b:' +str(ball_frect[0]) + ':' + str(ball_frect[0])))
     '''
     import inspect
 

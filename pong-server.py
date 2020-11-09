@@ -4,7 +4,7 @@ import socket, sys, threading
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 PORT = 5050
-SERVER = 'localhost'
+SERVER = ''
 FORMAT = 'utf-8'
 HEADER = 2048
 
