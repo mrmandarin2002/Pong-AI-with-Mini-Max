@@ -72,7 +72,8 @@ class Controller_Client_Thread(threading.Thread):
                             self.conn.send(str.encode("KILLED"))
                         else:
                             self.conn.send(str.encode("ALIVE"))
-                
+            except:
+                print("????")
 
 while True:
     conn, addr = s.accept()
