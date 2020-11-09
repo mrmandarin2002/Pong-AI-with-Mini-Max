@@ -35,9 +35,19 @@ class Game_Client_Thread(threading.Thread):
         while True:
             try:
                 data = self.conn.recv(2048).decode(FORMAT)
-                print(data)
+                #print(data)
             except:
                 print("AN ERROR HAS OCCURED!")
+
+    def kill(self):
+        try:
+            self.conn.send(str.encode("kill"))
+            print(self.conn.recv(2048).decode())
+            return True
+        except:
+            print("Could not kill :(")
+            return False
+
 
 
 class Controller_Client_Thread(threading.Thread):
@@ -50,7 +60,19 @@ class Controller_Client_Thread(threading.Thread):
         self.conn = conn
 
     def run(self):
-        pass
+        while(True):
+            try:
+                data = self.conn.recv(2048).decode(FORMAT)
+                print(data)
+                if(data == 'kill'):
+                    for client in game_clients:
+                        killed = client.kill()
+                        print(killed)
+                        if(killed):
+                            self.conn.send(str.encode("KILLED"))
+                        else:
+                            self.conn.send(str.encode("ALIVE"))
+                
 
 while True:
     conn, addr = s.accept()

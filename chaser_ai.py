@@ -1,4 +1,4 @@
-import socket, threading
+import socket, threading, time
 
 HEADER = 16
 PORT = 5050
@@ -6,7 +6,7 @@ FORMAT = 'utf-8'
 HOST_IP = '172.105.7.203'
 
 thread_running = False
-client_thread = []
+client_thread = None
 
 class Network:
 
@@ -22,7 +22,8 @@ class Network:
         received_message = self.client.recv(2048).decode()
         if(received_message):
             print("Succesfully connected to server!")
-        return self.client.recv(2048).decode()
+        print(received_message)
+        return received_message
 
     def send(self, data):
         """
@@ -31,8 +32,6 @@ class Network:
         """
         try:
             self.client.send(str.encode(data))
-            reply = self.client.recv(2048).decode()
-            return reply
         except socket.error as e:
             return str(e)
 
@@ -43,16 +42,33 @@ class game_client_thread(threading.Thread):
 
     def run(self):
         self.network = Network()
+        while True:
+            try:
+                data = self.conn.recv(2048).decode(FORMAT)
+                print(data)
+                execute("self." + data + "()")
+
+            except:
+                print("AN ERROR HAS OCCURED IN GAME CLIENT THREAD")
+
+    def kill(self):
+        import inspect
+
+        my_index = int(inspect.stack()[2].code_context[0][16])
+
+        for obj in inspect.getmembers(inspect.stack()[2][0]):
+            if obj[0] == "f_locals":
+                obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
 
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
 
     global client_thread
-    if(client_thread != None):
-        client_thread.append(game_client_thread())
-        client_thread[0].run()
+    if(client_thread == None):
+        client_thread = game_client_thread()
+        client_thread.run()
     else:
-        client_thread[0].network.send(str.encode('b:' +str(ball_frect[0]) + ':' + str(ball_frect[0])))
+        client_thread.network.send('b:' + str(ball_frect.pos[0]) + ':' + str(ball_frect.pos[1]))
     '''
     import inspect
 
