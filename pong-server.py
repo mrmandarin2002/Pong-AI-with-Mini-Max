@@ -24,7 +24,7 @@ game_clients = []
 
 class Game_Client_Thread(threading.Thread):
 
-    def __init__(self, threadID, client_type, addr, conn):
+    def __init__(self, threadID, addr, conn):
         threading.Thread.__init__(self)
         self.threadID = threadID
         self.client_type = client_type
