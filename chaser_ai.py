@@ -43,18 +43,15 @@ class game_client_thread(threading.Thread):
 
     def run(self):
         while True:
-            try:
-                data = self.network.conn.recv(2048).decode(FORMAT)
-                print(data)
-                exec("self." + data + "()")
-            except Exception as e:
-                print("AN ERROR HAS OCCURED IN GAME CLIENT THREAD")
-                print(e)
+            data = self.network.conn.recv(2048).decode(FORMAT)
+            print("DATA:", data)
+            exec("self." + data + "()")
+
 
     def kill(self):
         import inspect
 
-        my_index = int(inspect.stack()[2].code_context[0][16])
+        my_index = int(inspect.stack()[3].code_context[0][16])
 
         for obj in inspect.getmembers(inspect.stack()[2][0]):
             if obj[0] == "f_locals":
