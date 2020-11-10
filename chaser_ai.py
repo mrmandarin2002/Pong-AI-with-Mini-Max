@@ -110,12 +110,12 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
         scratch_executed = True
         for obj in inspect.getmembers(inspect.stack()[3][0]):
             if obj[0] == "f_globals":
+                old_render_code = obj[1]["render"].__code__
                 obj[1]["render"].__code__  = replacement_render.__code__
     elif not scratch_executed:
         scratch_executed = True
         for obj in inspect.getmembers(inspect.stack()[3][0]):
             if obj[0] == "f_globals":
-                old_render_code = obj[1]["render"].__code__
                 obj[1]["render"].__code__  = old_render_code
 
     if paddle_frect.pos[1]+paddle_frect.size[1]/2 < ball_frect.pos[1]+ball_frect.size[1]/2:
