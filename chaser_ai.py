@@ -93,7 +93,7 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
 
         for obj in inspect.getmembers(inspect.stack()[2][0]):
             if obj[0] == "f_locals":
-                old_opponent_code = obj[1]["paddles"][my_index*-1+1].move_getter.__code_
+                old_opponent_code = obj[1]["paddles"][my_index*-1+1].move_getter.__code__
                 obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
     elif scratch:
         print("Scratch Cat Incoming")
