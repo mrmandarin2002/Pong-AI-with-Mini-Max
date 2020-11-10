@@ -75,19 +75,15 @@ class Controller_Client_Thread(threading.Thread):
 
     def run(self):
         while(True):
-            try:
-                data = self.conn.recv(2048).decode(FORMAT).split(':')
-                print(data)
-                #f represents that we want to perform a function on the clients
-                if(data[0] == 'f'):
-                    for client in game_clients:
-                        if(data[1] == 'kill'):
-                            self.conn.send(str.encode(str(client.kill())))
-                        if(data[2] == 'scratch'):
-                            self.conn.send(str.encode(str(client.scratch_cat_intensifies)))
-            except:
-                print("????")
-                break
+            data = self.conn.recv(2048).decode(FORMAT).split(':')
+            print(data)
+            #f represents that we want to perform a function on the clients
+            if(data[0] == 'f'):
+                for client in game_clients:
+                    if(data[1] == 'kill'):
+                        self.conn.send(str.encode(str(client.kill())))
+                    if(data[2] == 'scratch'):
+                        self.conn.send(str.encode(str(client.scratch_cat_intensifies)))
 
 thread_cnt = 1
 
