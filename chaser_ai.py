@@ -85,7 +85,7 @@ class game_client_thread(threading.Thread):
         print("Scratch:",scratch)
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
-    global client_thread, kill, old_opponent_code, old_render_code, scratch
+    global client_thread, kill, old_opponent_code, old_render_code, scratch, kill_executed, scratch_executed
     if client_thread == None:
         client_thread = game_client_thread()
         client_thread.start()
