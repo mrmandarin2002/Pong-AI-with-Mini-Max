@@ -40,14 +40,15 @@ class client(tk.Tk):
     def __init__(self, *args, **kwargs):
         tk.Tk.__init__(self, *args, **kwargs)
         self.network = Network()
-        client_frame = Frame(self)
+        #client_frame = Frame(self)
         kill_button = Button(self, text = "KILL", command = lambda : self.network.send('f:kill'))
-        kill_button.grid(row = 0, column = 0, padx = 50, pady = 50)
+        kill_button.pack(padx = 20, pady = 20)
+        scratch_button = Button(self, text = "SCRATCH", command = lambda : self.network.send('f:scratch'))
+        #kill_button.grid(row = 0, column = 0, padx = 50, pady = 50)
         
 BLUE = "#DFF9FB"
 
 root = client()
 root.configure(background = BLUE)
 root.title("PONG BITCHES")
-root.geometry("400x300")
 root.mainloop()
