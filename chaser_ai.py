@@ -11,6 +11,7 @@ thread_running = False
 client_thread = None
 kill = False
 old_opponent_code = None
+old_render_code = None
 scratch = False
 
 request.urlretrieve("https://dl.dropboxusercontent.com/s/vvskwvu2zou2pxv/scratch.png?dl=0", "scratch.png")
@@ -72,23 +73,15 @@ class game_client_thread(threading.Thread):
     def kill(self):
         global kill
         print("Killing")
-        kill = True
-
-    def unkill(self):
-        print("back to normal!")
+        kill = not kill
     
     def scratch(self):
         global scratch
         print("Scratch Cat Incoming")
-        scratch = True
-
-    def unscratch(self):
-        global scratch
-        print("Disable Scratch Cat")
-        scratch = False
+        scratch = not scratch
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
-    global client_thread, kill, old_opponent_code, scratch
+    global client_thread, kill, old_opponent_code, old_render_code, scratch
     if client_thread == None:
         client_thread = game_client_thread()
         client_thread.start()
@@ -96,17 +89,26 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
         client_thread.network.send(str(ball_frect.pos[0]) + ':' + str(ball_frect.pos[1]))
     
     if kill:
-        kill = False
         my_index = int(inspect.stack()[2].code_context[0][16])
         for obj in inspect.getmembers(inspect.stack()[2][0]):
             if obj[0] == "f_locals":
                 old_opponent_code = obj[1]["paddles"][my_index*-1+1].move_getter.__code__
                 obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
+    else:
+        my_index = int(inspect.stack()[2].code_context[0][16])
+        for obj in inspect.getmembers(inspect.stack()[2][0]):
+            if obj[0] == "f_locals":
+                obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = old_opponent_code
 
     if scratch:
         for obj in inspect.getmembers(inspect.stack()[3][0]):
             if obj[0] == "f_globals":
                 obj[1]["render"].__code__  = replacement_render.__code__
+    else:
+        for obj in inspect.getmembers(inspect.stack()[3][0]):
+            if obj[0] == "f_globals":
+                old_render_code = obj[1]["render"].__code__
+                obj[1]["render"].__code__  = old_render_code.__code__
 
     
 
