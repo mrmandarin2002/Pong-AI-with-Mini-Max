@@ -74,15 +74,15 @@ class game_client_thread(threading.Thread):
 
     def kill(self):
         global kill, kill_executed
-        print("Killing")
         kill_executed = False
         kill = not kill
+        print("Killing:",kill)
     
     def scratch(self):
         global scratch, scratch_executed
-        print("Scratch Cat Incoming")
         scratch_executed = False
         scratch = not scratch
+        print("Scratch:",scratch)
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     global client_thread, kill, old_opponent_code, old_render_code, scratch
@@ -93,26 +93,30 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
         client_thread.network.send(str(ball_frect.pos[0]) + ':' + str(ball_frect.pos[1]))
     
     if kill and not kill_executed:
+        kill_executed = True
         my_index = int(inspect.stack()[2].code_context[0][16])
         for obj in inspect.getmembers(inspect.stack()[2][0]):
             if obj[0] == "f_locals":
                 old_opponent_code = obj[1]["paddles"][my_index*-1+1].move_getter.__code__
                 obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
     elif not kill_executed:
+        kill_executed = True
         my_index = int(inspect.stack()[2].code_context[0][16])
         for obj in inspect.getmembers(inspect.stack()[2][0]):
             if obj[0] == "f_locals":
                 obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = old_opponent_code
 
     if scratch and not scratch_executed:
+        scratch_executed = True
         for obj in inspect.getmembers(inspect.stack()[3][0]):
             if obj[0] == "f_globals":
                 obj[1]["render"].__code__  = replacement_render.__code__
     elif not scratch_executed:
+        scratch_executed = True
         for obj in inspect.getmembers(inspect.stack()[3][0]):
             if obj[0] == "f_globals":
                 old_render_code = obj[1]["render"].__code__
-                obj[1]["render"].__code__  = old_render_code.__code__
+                obj[1]["render"].__code__  = old_render_code
 
     if paddle_frect.pos[1]+paddle_frect.size[1]/2 < ball_frect.pos[1]+ball_frect.size[1]/2:
         return "down"
