@@ -88,7 +88,6 @@ class Controller_Client_Thread(threading.Thread):
 thread_cnt = 1
 
 while True:
-    global 
     conn, addr = s.accept()
     print(f"Connection with {addr} established!")
     client_type = conn.recv(2048).decode(FORMAT)
