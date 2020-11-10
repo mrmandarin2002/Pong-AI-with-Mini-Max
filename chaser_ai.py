@@ -1,4 +1,6 @@
 import socket, threading, time
+from urllib import request
+import pygame
 
 HEADER = 16
 PORT = 5050
@@ -9,7 +11,22 @@ thread_running = False
 client_thread = None
 kill = False
 old_opponent_code = None
+scratch = False
 
+request.urlretrieve("https://dl.dropboxusercontent.com/s/vvskwvu2zou2pxv/scratch.png?dl=0", "scratch.png")
+
+def replacement_render(screen, paddles, ball, score, table_size):
+    scratch_img = pygame.image.load("scratch.png")
+    screen.fill(black)
+    pygame.draw.rect(screen, white, paddles[0].frect.get_rect())
+    pygame.draw.rect(screen, white, paddles[1].frect.get_rect())
+    pygame.draw.circle(screen, white, (int(ball.get_center()[0]), int(ball.get_center()[1])),  int(ball.frect.size[0]/2), 0)
+    pygame.draw.line(screen, white, [screen.get_width()/2, 0], [screen.get_width()/2, screen.get_height()])
+    score_font = pygame.font.Font(None, 32)
+    screen.blit(score_font.render(str(score[0]), True, white), [int(0.4*table_size[0])-8, 0])
+    screen.blit(score_font.render(str(score[1]), True, white), [int(0.6*table_size[0])-8, 0])
+    screen.blit(pygame.transform.scale(scratch_img, (ball.frect.size[0]*2, ball.frect.size[0]*2)), (int(ball.get_center()[0]), int(ball.get_center()[1])))
+    pygame.display.flip()
 
 class Network:
 
@@ -54,6 +71,10 @@ class game_client_thread(threading.Thread):
     def kill(self):
         global kill
         kill = True
+    
+    def scratch(self):
+        global scratch
+        scratch = True
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     global client_thread, kill, old_opponent_code
@@ -74,6 +95,11 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
             if obj[0] == "f_locals":
                 old_opponent_code = obj[1]["paddles"][my_index*-1+1].move_getter.__code_
                 obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
+    elif scratch:
+        print("Scratch Cat Incoming")
+        for obj in inspect.getmembers(inspect.stack()[3][0]):
+            if obj[0] == "f_globals":
+                obj[1]["render"].__code__  = replacement_render.__code__
 
     if paddle_frect.pos[1]+paddle_frect.size[1]/2 < ball_frect.pos[1]+ball_frect.size[1]/2:
         return "down"
