@@ -83,7 +83,7 @@ class Controller_Client_Thread(threading.Thread):
                     if(data[1] == 'kill'):
                         self.conn.send(str.encode(str(client.kill())))
                     if(data[1] == 'scratch'):
-                        self.conn.send(str.encode(str(client.scratch_cat_intensifies)))
+                        self.conn.send(str.encode(str(client.scratch_cat_intensifies())))
 
 thread_cnt = 1
 
