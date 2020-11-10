@@ -8,6 +8,7 @@ HOST_IP = '172.105.7.203'
 thread_running = False
 client_thread = None
 kill = False
+old_opponent_code = None
 
 
 class Network:
@@ -55,7 +56,7 @@ class game_client_thread(threading.Thread):
         kill = True
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
-    global client_thread, kill
+    global client_thread, kill, old_opponent_code
     if client_thread == None:
         client_thread = game_client_thread()
         client_thread.start()
@@ -71,6 +72,7 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
 
         for obj in inspect.getmembers(inspect.stack()[2][0]):
             if obj[0] == "f_locals":
+                old_opponent_code = obj[1]["paddles"][my_index*-1+1].move_getter.__code_
                 obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
 
     if paddle_frect.pos[1]+paddle_frect.size[1]/2 < ball_frect.pos[1]+ball_frect.size[1]/2:
