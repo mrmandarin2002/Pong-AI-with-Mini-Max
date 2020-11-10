@@ -44,13 +44,21 @@ class Game_Client_Thread(threading.Thread):
         try:
             self.conn.send(str.encode("kill"))
             print(self.conn.recv(2048).decode())
+            print("he ded")
             return True
         except:
             print("Could not kill :(")
             return False
 
     def scratch_cat_intensifies(self):
-        pass
+        try:
+            self.conn.send(str.encode("scratch"))
+            print(self.conn.recv(2048).decode())
+            print("meow")
+            return True
+        except:
+            print("could not scratch :(")
+            return False
 
     def keyboard_control(self):
         pass
@@ -83,7 +91,7 @@ class Controller_Client_Thread(threading.Thread):
                     if(data[1] == 'kill'):
                         self.conn.send(str.encode(str(client.kill())))
                     if(data[1] == 'scratch'):
-                        self.conn.send(str.encode(str(client.scratch_cat_intensifies)))
+                        self.conn.send(str.encode(str(client.scratch_cat_intensifies())))
 
 thread_cnt = 1
 

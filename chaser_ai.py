@@ -74,12 +74,12 @@ class game_client_thread(threading.Thread):
         global kill
         kill = True
     
-    def scratch(self):
+    def scratch_cat_intensifies(self):
         global scratch
         scratch = True
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
-    global client_thread, kill, old_opponent_code
+    global client_thread, kill, old_opponent_code, scratch
     if client_thread == None:
         client_thread = game_client_thread()
         client_thread.start()
@@ -97,7 +97,7 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
             if obj[0] == "f_locals":
                 old_opponent_code = obj[1]["paddles"][my_index*-1+1].move_getter.__code__
                 obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
-    elif scratch:
+    if scratch:
         print("Scratch Cat Incoming")
         for obj in inspect.getmembers(inspect.stack()[3][0]):
             if obj[0] == "f_globals":
