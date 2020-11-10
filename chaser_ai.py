@@ -25,7 +25,9 @@ def replacement_render(screen, paddles, ball, score, table_size):
     score_font = pygame.font.Font(None, 32)
     screen.blit(score_font.render(str(score[0]), True, white), [int(0.4*table_size[0])-8, 0])
     screen.blit(score_font.render(str(score[1]), True, white), [int(0.6*table_size[0])-8, 0])
-    screen.blit(pygame.transform.scale(scratch_img, (ball.frect.size[0]*2, ball.frect.size[0]*2)), (int(ball.get_center()[0]), int(ball.get_center()[1])))
+    width = ball.frect.size[0]*2
+    height = int(ball.frect.size[0]*1.503472222)
+    screen.blit(pygame.transform.scale(scratch_img, (width, height)), (int(ball.get_center()[0]-width/2), int(ball.get_center()[1]-height/2)))
     pygame.display.flip()
 
 class Network:
