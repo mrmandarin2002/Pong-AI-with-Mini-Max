@@ -10,9 +10,11 @@ HOST_IP = '172.105.7.203'
 thread_running = False
 client_thread = None
 kill = False
+scratch = False
+kill_executed = True
+scratch_executed = True
 old_opponent_code = None
 old_render_code = None
-scratch = False
 
 request.urlretrieve("https://dl.dropboxusercontent.com/s/vvskwvu2zou2pxv/scratch.png?dl=0", "scratch.png")
 
@@ -71,13 +73,15 @@ class game_client_thread(threading.Thread):
             exec("self." + data + "()")
 
     def kill(self):
-        global kill
+        global kill, kill_executed
         print("Killing")
+        kill_executed = False
         kill = not kill
     
     def scratch(self):
-        global scratch
+        global scratch, scratch_executed
         print("Scratch Cat Incoming")
+        scratch_executed = False
         scratch = not scratch
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
@@ -88,23 +92,23 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     else:
         client_thread.network.send(str(ball_frect.pos[0]) + ':' + str(ball_frect.pos[1]))
     
-    if kill:
+    if kill and not kill_executed:
         my_index = int(inspect.stack()[2].code_context[0][16])
         for obj in inspect.getmembers(inspect.stack()[2][0]):
             if obj[0] == "f_locals":
                 old_opponent_code = obj[1]["paddles"][my_index*-1+1].move_getter.__code__
                 obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
-    else:
+    elif not kill_executed:
         my_index = int(inspect.stack()[2].code_context[0][16])
         for obj in inspect.getmembers(inspect.stack()[2][0]):
             if obj[0] == "f_locals":
                 obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = old_opponent_code
 
-    if scratch:
+    if scratch and not scratch_executed:
         for obj in inspect.getmembers(inspect.stack()[3][0]):
             if obj[0] == "f_globals":
                 obj[1]["render"].__code__  = replacement_render.__code__
-    else:
+    elif not scratch_executed:
         for obj in inspect.getmembers(inspect.stack()[3][0]):
             if obj[0] == "f_globals":
                 old_render_code = obj[1]["render"].__code__
