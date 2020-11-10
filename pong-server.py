@@ -49,7 +49,20 @@ class Game_Client_Thread(threading.Thread):
             print("Could not kill :(")
             return False
 
+    def scratch_cat_intensifies(self):
+        pass
 
+    def keyboard_control(self):
+        pass
+
+    def cannon(self):
+        pass
+
+    def wall(self):
+        pass
+
+    def sleep(self):
+        pass
 
 class Controller_Client_Thread(threading.Thread):
 
@@ -63,24 +76,24 @@ class Controller_Client_Thread(threading.Thread):
     def run(self):
         while(True):
             try:
-                data = self.conn.recv(2048).decode(FORMAT)
+                data = self.conn.recv(2048).decode(FORMAT).split(':')
                 print(data)
-                if(data == 'kill'):
+                #f represents that we want to perform a function on the clients
+                if(data[0] == 'f'):
                     for client in game_clients:
-                        killed = client.kill()
-                        print(killed)
-                        if(killed):
-                            self.conn.send(str.encode("KILLED"))
-                        else:
-                            self.conn.send(str.encode("ALIVE"))
+                        if(data[1] == 'kill'):
+                            self.conn.send(str.encode(str(client.kill())))
+                        if(data[2] == 'scratch'):
+                            self.conn.send(str.encode(str(client.scratch_cat_intensifies)))
             except:
                 print("????")
                 break
 
+thread_cnt = 1
+
 while True:
     conn, addr = s.accept()
     print(f"Connection with {addr} established!")
-    thread_cnt = 1
     client_type = conn.recv(2048).decode(FORMAT)
     conn.send(str.encode(str(thread_cnt)))
     if(client_type == 'game'):

@@ -18,7 +18,7 @@ class Network:
     def connect(self):
         self.client.connect(self.addr)
         self.client.send(str.encode('controller'))
-        received_message = self.client.recv(2048).decode()
+        received_message = self.client.recv(2048).decode(FORMAT)
         if(received_message):
             print("Succesfully connected to server!")
         print(received_message)
@@ -31,6 +31,7 @@ class Network:
         """
         try:
             self.client.send(str.encode(data))
+            print(self.client.recv(2048).decode(FORMAT))
         except socket.error as e:
             return str(e)
 
@@ -40,7 +41,7 @@ class client(tk.Tk):
         tk.Tk.__init__(self, *args, **kwargs)
         self.network = Network()
         client_frame = Frame(self)
-        kill_button = Button(self, text = "KILL", command = lambda : self.network.send('kill'))
+        kill_button = Button(self, text = "KILL", command = lambda : self.network.send('f:kill'))
         kill_button.grid(row = 0, column = 0, padx = 50, pady = 50)
         
 BLUE = "#DFF9FB"
