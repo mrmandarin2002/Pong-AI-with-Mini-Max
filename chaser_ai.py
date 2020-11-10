@@ -108,8 +108,6 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
             if obj[0] == "f_globals":
                 obj[1]["render"].__code__  = replacement_render.__code__
 
-    
-
     if paddle_frect.pos[1]+paddle_frect.size[1]/2 < ball_frect.pos[1]+ball_frect.size[1]/2:
         return "down"
     else:
