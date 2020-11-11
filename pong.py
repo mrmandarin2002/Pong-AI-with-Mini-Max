@@ -424,10 +424,10 @@ def init_game():
                Paddle((table_size[0]-20, table_size[1]/2), paddle_size, paddle_speed, max_angle, 0, timeout)]
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
-    import chaser_ai
+    import chaser_ai, bot_ai
     
     paddles[0].move_getter = chaser_ai.pong_ai
-    paddles[1].move_getter = directions_from_input #chaser_ai.pong_ai
+    paddles[1].move_getter = bot_ai.pong_ai #chaser_ai.pong_ai
     
     # note that the game loop is run twice to simulate the AIs playing either side
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)

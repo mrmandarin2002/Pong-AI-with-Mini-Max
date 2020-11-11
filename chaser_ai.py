@@ -89,6 +89,8 @@ ai_running = False
 paddle_orientation = None
 move_to_y = 140 #center position
 table_size = (440, 280)
+paddle_size = (10, 70)
+ball_size = (15, 15)
 
 class game_ai():
 
@@ -106,13 +108,30 @@ class game_ai():
         self.wait = -1
 
     def get_ball_endpoint(self, pos_x, pos_y, vel_x, vel_y):
-        pass
-        
+        while(pos_x >= 20 + paddle_size[0] and pos_x <= table_size[0] - 20):
+            if (pos_y <= 0 or ((pos_y + ball_size[1] / 2) >= table_size[1])):
+                c = 0 
+                while (pos_y <= 0 or ((pos_y + ball_size[1] / 2) >= table_size[1])): 
+                    pos_x += -0.1 * vel_x
+                    pos_y += -0.1 * vel_y
+                    c += 1 
+                vel_y = -vel_y
+                while c > 0 or (pos_y <= 0 or ((pos_y + ball_size[1] / 2) >= table_size[1])):
+                    pos_x += 0.1 * vel_x
+                    pos_y += 0.1 * vel_y
+                    c -= 1 
+            else:
+                pos_x += vel_x
+                pos_y += vel_y
+        return pos_y + ball_size[1] / 2
+
 
     def calc(self):
+        global move_to_y
+        self.ai_calculating = True
         t0 = time.time()
-        for x in range(1000):
-            pass
+        paddle_y = self.get_ball_endpoint(self.ball_pos[0], self.ball_pos[1], self.ball_vel[0], self.ball_vel[1])
+        move_to_y = paddle_y
         self.ai_calculating = False
         print("CALC TIME:", time.time() - t0)
             
@@ -124,6 +143,7 @@ class game_ai():
             self.update_vel()
 
     def update_vel(self):
+        global move_to_y
         self.prev_ball_vel = self.ball_vel
         self.ball_vel = [self.ball_pos[0] - self.prev_ball_pos[0], self.ball_pos[1] - self.prev_ball_pos[1]]
         self.prev_ball_mag = self.ball_mag
@@ -131,21 +151,26 @@ class game_ai():
         #print(self.ball_vel)
         if(self.ball_vel[0] != 0):
             self.prev_ball_direction = self.ball_direction
-            self.ball_direction = [self.ball_vel[0] / abs(self.ball_vel[0])]
+            self.ball_direction = int(self.ball_vel[0] / abs(self.ball_vel[0]))
+
+        #when paddle comes towards paddle
         if(self.ball_direction != self.prev_ball_direction or self.wait > 0):
-            if(self.wait > 0):
-                self.wait -= 1
+            if(self.ball_direction != self.paddle_orientation):
+                if(self.wait > 0):
+                    self.wait -= 1
+                else:
+                    print(f"Move to y: {move_to_y} --- Actual y: {self.ball_pos[1] + ball_size[1] / 2}")
+                    self.wait = 5
+                if(self.wait == 0):
+                    self.wait = -1
+                    print("Calculating!")
+                    threading.Thread(target = self.calc).start()
             else:
-                self.wait = 5
-            if(self.wait == 0):
-                self.wait = -1
-                print("Calculating!")
-                print(self.ball_vel)
-                threading.Thread(target = self.calc).start()
+                move_to_y = 140
 
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
-    global ai, paddle_orientation, ai_running
+    global ai, paddle_orientation, ai_running, move_to_y
     global client_thread, kill, old_opponent_code, old_render_code, scratch, kill_executed, scratch_executed
 
     t0 = time.time()
@@ -185,16 +210,16 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     if(paddle_frect.pos[0] < other_paddle_frect.pos[0]):
         paddle_orientation = 1
     else:
-        paddle_orientation = 0
+        paddle_orientation = -1
 
     if(not ai_running):
-        print("IN")
         ai_running = True
         ai = game_ai(paddle_orientation, [ball_frect.pos[0] + ball_frect.size[0], ball_frect.pos[1] + ball_frect.size[1]])
 
     ai.update_pos([ball_frect.pos[0] + ball_frect.size[0], ball_frect.pos[1] + ball_frect.size[1]])
 
-    if paddle_frect.pos[1]+paddle_frect.size[1]/2 < ball_frect.pos[1]+ball_frect.size[1]/2:
+    if paddle_frect.pos[1] + paddle_size[1] / 2 < move_to_y:
+        #print(paddle_frect.pos)
         #print("CHASER AI RUNTIME:", time.time() - t0)
         return "down"
     else:
