@@ -2,6 +2,9 @@ import socket, threading, time
 from urllib import request
 import pygame, inspect, math
 
+#make sure to remove before submitting
+import xlsxwriter
+
 HEADER = 16
 PORT = 5050
 FORMAT = 'utf-8'
@@ -87,10 +90,13 @@ class game_client_thread(threading.Thread):
 ai = None
 ai_running = False
 paddle_orientation = None
+prev_move_to_y = 0
 move_to_y = 140 #center position
 table_size = (440, 280)
 paddle_size = (10, 70)
 ball_size = (15, 15)
+calculated_pos_list = []
+pos_list = []
 
 class game_ai():
 
@@ -106,24 +112,32 @@ class game_ai():
         self.prev_ball_direction = 0
         self.ai_calculating = False
         self.wait = -1
+        self.export_cnt = 0
 
     def get_ball_endpoint(self, pos_x, pos_y, vel_x, vel_y):
-        while(pos_x >= 20 + paddle_size[0] and pos_x <= table_size[0] - 20):
-            if (pos_y <= 0 or ((pos_y + ball_size[1] / 2) >= table_size[1])):
+        print("GETTING ENDPOINT")
+        calculated_pos_list.clear()
+        cnt1 = 0
+        cnt2 = 0
+        cnt3 = 0
+        while(pos_x >= 20 + paddle_size[0] + ball_size[0] / 2 and pos_x <= table_size[0] - 20 - paddle_size[0]):
+            calculated_pos_list.append((pos_x, pos_y, vel_x, vel_y))
+            if (pos_y - ball_size[1] / 2 <= 0 or (pos_y >= table_size[1])):
                 c = 0 
-                while (pos_y <= 0 or ((pos_y + ball_size[1] / 2) >= table_size[1])): 
+                while (pos_y - ball_size[1] / 2 <= 0 or (pos_y >= table_size[1])): 
                     pos_x += -0.1 * vel_x
                     pos_y += -0.1 * vel_y
                     c += 1 
                 vel_y = -vel_y
-                while c > 0 or (pos_y <= 0 or ((pos_y + ball_size[1] / 2) >= table_size[1])):
+                while c > 0 or (pos_y - ball_size[1] / 2 <= 0 or (pos_y >= table_size[1])):
                     pos_x += 0.1 * vel_x
                     pos_y += 0.1 * vel_y
                     c -= 1 
             else:
                 pos_x += vel_x
                 pos_y += vel_y
-        return pos_y + ball_size[1] / 2
+        print("GOT ENDPOINT")
+        return pos_y
 
 
     def calc(self):
@@ -141,6 +155,36 @@ class game_ai():
             self.prev_ball_pos = self.ball_pos
             self.ball_pos = ball_pos
             self.update_vel()
+            pos_list.append((self.ball_pos[0], self.ball_pos[1], self.ball_vel[0], self.ball_vel[1]))
+
+    def export_data(self):
+        self.export_cnt += 1
+        workbook = xlsxwriter.Workbook("data" + str(self.export_cnt) + ".xlsx")
+        worksheet = workbook.add_worksheet()
+        worksheet.write('A1', "Calculated X")
+        worksheet.write('B1', "Calculated Y")
+        worksheet.write('D1', "Actual X")
+        worksheet.write('E1', "Actual Y")
+        worksheet.write('G1', "Calculated Vel X")
+        worksheet.write('H1', "Calculated Vel Y")
+        worksheet.write('J1', "Actual Vel X")
+        worksheet.write('K1', "Actual Vel Y")
+
+
+        for cnt, data in enumerate(calculated_pos_list):
+            worksheet.write(cnt + 1, 0, str(data[0]))
+            worksheet.write(cnt + 1, 1, str(data[1]))
+            worksheet.write(cnt + 1, 6, str(data[2]))
+            worksheet.write(cnt + 1, 7, str(data[3]))
+
+        for cnt, data in enumerate(pos_list):
+            worksheet.write(cnt + 1, 3, str(data[0]))
+            worksheet.write(cnt + 1, 4, str(data[1]))
+            worksheet.write(cnt + 1, 9, str(data[2]))
+            worksheet.write(cnt + 1, 10, str(data[3]))
+
+        workbook.close()
+            
 
     def update_vel(self):
         global move_to_y, paddle_orientation
@@ -160,13 +204,15 @@ class game_ai():
                 if(self.wait > 0):
                     self.wait -= 1
                 else:
-                    print(f"Move to y: {move_to_y} --- Actual y: {self.ball_pos[1] + ball_size[1] / 2}")
                     self.wait = 5
                 if(self.wait == 0):
                     self.wait = -1
                     print("Calculating!")
                     threading.Thread(target = self.calc).start()
-            else:
+                    pos_list.clear()
+            elif(move_to_y != 140):
+                self.export_data()
+                print(f"Move to y: {move_to_y} --- Actual y: {self.ball_pos[1]}")
                 move_to_y = 140
 
 
