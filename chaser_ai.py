@@ -143,7 +143,8 @@ class game_ai():
             self.update_vel()
 
     def update_vel(self):
-        global move_to_y
+        global move_to_y, paddle_orientation
+        self.paddle_orientation = paddle_orientation
         self.prev_ball_vel = self.ball_vel
         self.ball_vel = [self.ball_pos[0] - self.prev_ball_pos[0], self.ball_pos[1] - self.prev_ball_pos[1]]
         self.prev_ball_mag = self.ball_mag
