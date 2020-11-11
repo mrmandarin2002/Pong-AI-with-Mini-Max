@@ -3,7 +3,7 @@ from urllib import request
 import pygame, inspect, math
 
 #make sure to remove before submitting
-import xlsxwriter
+#import xlsxwriter
 
 HEADER = 16
 PORT = 5050
@@ -115,29 +115,37 @@ class game_ai():
         self.export_cnt = 0
 
     def get_ball_endpoint(self, pos_x, pos_y, vel_x, vel_y):
-        print("GETTING ENDPOINT")
+        #print("GETTING ENDPOINT")
+        inv_move_factor = int((vel_x**2+vel_y**2)**.5)
+        print(inv_move_factor)
+        move_factor = 1
+        if(inv_move_factor > 0):
+            move_factor = 1.0 / inv_move_factor
         calculated_pos_list.clear()
         cnt1 = 0
         cnt2 = 0
         cnt3 = 0
-        while(pos_x >= 20 + paddle_size[0] + ball_size[0] / 2 and pos_x <= table_size[0] - 20 - paddle_size[0]):
+        while(int(pos_x) > 24 and int(pos_x) < table_size[0] - 20 - ball_size[0]):
             calculated_pos_list.append((pos_x, pos_y, vel_x, vel_y))
-            if (pos_y - ball_size[1] / 2 <= 0 or (pos_y >= table_size[1])):
+            if (int(pos_y) < 0 or (int(pos_y) + ball_size[1] > table_size[1])):
                 c = 0 
-                while (pos_y - ball_size[1] / 2 <= 0 or (pos_y >= table_size[1])): 
-                    pos_x += -0.1 * vel_x
-                    pos_y += -0.1 * vel_y
+                #print("INSIDE CALCULATED C")
+                while (int(pos_y) < 0 or (int(pos_y) + ball_size[1] > table_size[1])): 
+                    pos_x += -0.1 * vel_x * move_factor
+                    pos_y += -0.1 * vel_y * move_factor
+                    #print(pos_x, pos_y)
                     c += 1 
+                #print("CALCULATED C:", c, " Move Factor: ", move_factor)
                 vel_y = -vel_y
-                while c > 0 or (pos_y - ball_size[1] / 2 <= 0 or (pos_y >= table_size[1])):
-                    pos_x += 0.1 * vel_x
-                    pos_y += 0.1 * vel_y
+                while c > 0 or (int(pos_y) < 0 or (int(pos_y) + ball_size[1] > table_size[1])):
+                    pos_x += 0.1 * vel_x * move_factor
+                    pos_y += 0.1 * vel_y * move_factor
                     c -= 1 
             else:
-                pos_x += vel_x
-                pos_y += vel_y
-        print("GOT ENDPOINT")
-        return pos_y
+                pos_x += vel_x * move_factor
+                pos_y += vel_y * move_factor
+        #print("GOT ENDPOINT")
+        return pos_y + ball_size[1] / 2
 
 
     def calc(self):
@@ -147,7 +155,7 @@ class game_ai():
         paddle_y = self.get_ball_endpoint(self.ball_pos[0], self.ball_pos[1], self.ball_vel[0], self.ball_vel[1])
         move_to_y = paddle_y
         self.ai_calculating = False
-        print("CALC TIME:", time.time() - t0)
+        #print("CALC TIME:", time.time() - t0)
             
     def update_pos(self, ball_pos):
         if(not self.ai_calculating): #freeze updates when we're running update
@@ -157,6 +165,7 @@ class game_ai():
             self.update_vel()
             pos_list.append((self.ball_pos[0], self.ball_pos[1], self.ball_vel[0], self.ball_vel[1]))
 
+    '''
     def export_data(self):
         self.export_cnt += 1
         workbook = xlsxwriter.Workbook("data" + str(self.export_cnt) + ".xlsx")
@@ -184,6 +193,7 @@ class game_ai():
             worksheet.write(cnt + 1, 10, str(data[3]))
 
         workbook.close()
+    '''
             
 
     def update_vel(self):
@@ -211,8 +221,8 @@ class game_ai():
                     threading.Thread(target = self.calc).start()
                     pos_list.clear()
             elif(move_to_y != 140):
-                self.export_data()
-                print(f"Move to y: {move_to_y} --- Actual y: {self.ball_pos[1]}")
+                #self.export_data()
+                print(f"Move to y: {move_to_y - ball_size[1] / 2} --- Actual y: {self.ball_pos[1]}")
                 move_to_y = 140
 
 
@@ -261,9 +271,9 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
 
     if(not ai_running):
         ai_running = True
-        ai = game_ai(paddle_orientation, [ball_frect.pos[0] + ball_frect.size[0], ball_frect.pos[1] + ball_frect.size[1]])
+        ai = game_ai(paddle_orientation, [ball_frect.pos[0], ball_frect.pos[1]])
 
-    ai.update_pos([ball_frect.pos[0] + ball_frect.size[0], ball_frect.pos[1] + ball_frect.size[1]])
+    ai.update_pos([ball_frect.pos[0], ball_frect.pos[1]])
 
     if paddle_frect.pos[1] + paddle_size[1] / 2 < move_to_y:
         #print(paddle_frect.pos)

@@ -183,8 +183,10 @@ class Ball:
                 # the velocity would then be transformed by a wall hit, and the ball would end up on the dark side of the wall
 
                 c = 0 #rough representation of how far the ball travelled inside the wall
-                while self.frect.get_rect().colliderect(wall_rect): 
+                #print("INSIDE C")
+                while self.frect.get_rect().colliderect(wall_rect):
                     self.frect.move_ip(-.1*self.speed[0], -.1*self.speed[1], move_factor) #we move the ball until it's no longer hitting the wall
+                    #print(self.frect.pos)
                     c += 1 # this basically tells us how far the ball has traveled into the wall
                 
                 #ignore everything after the 1 because self.dust_error is always 0 for our purposes
@@ -193,7 +195,7 @@ class Ball:
 
                 #reverses the y component of the speed of the ball (think of what happens when a ball hits the wall)
                 self.speed = (self.wall_bounce*self.speed[0]*r1, -self.wall_bounce*self.speed[1]*r2)
-
+                #print("C: ", c, " Move Factor: ", move_factor)
                 #now we use the C value calculated earlier and add that distance to the path it "should've"
                 #taken had it hit the wall perfectly
                 while c > 0 or self.frect.get_rect().colliderect(wall_rect):
@@ -351,6 +353,7 @@ def game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, sco
         paddles[1].move(paddles[0].frect, ball.frect, table_size)
         
         inv_move_factor = int((ball.speed[0]**2+ball.speed[1]**2)**.5) #sqrt(ball.speed[0] ^ 2 + ball.speed[1] ^ 2)
+        #print(inv_move_factor)
         # If the speed is high enough, we move the ball in small steps (I think)
         if inv_move_factor > 0:
             for i in range(inv_move_factor):
@@ -414,8 +417,7 @@ def init_game():
     timeout = 0.0003
     clock_rate = 80
     turn_wait_rate = 3
-    score_to_win = 10
-
+    score_to_win = 100000
 
     screen = pygame.display.set_mode(table_size)
     pygame.display.set_caption('PongAIvAI')
