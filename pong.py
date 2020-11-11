@@ -357,6 +357,8 @@ def game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, sco
                 ball.move(paddles, table_size, 1./inv_move_factor)
         else:
             ball.move(paddles, table_size, 1)
+
+        #print("BALL SPEED: ", ball.speed)
         
         if not display:
             continue

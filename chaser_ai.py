@@ -1,6 +1,6 @@
 import socket, threading, time
 from urllib import request
-import pygame, inspect
+import pygame, inspect, math
 
 HEADER = 16
 PORT = 5050
@@ -84,14 +84,78 @@ class game_client_thread(threading.Thread):
         scratch = not scratch
         print("Scratch:",scratch)
 
+ai = None
+ai_running = False
+paddle_orientation = None
+move_to_y = 140 #center position
+table_size = (440, 280)
+
+class game_ai():
+
+    def __init__(self, orientation, ball_pos):
+        self.paddle_orientation = orientation
+        self.prev_ball_pos = ball_pos
+        self.ball_pos = ball_pos
+        self.prev_ball_vel = [0,0]
+        self.ball_vel = [0,0]
+        self.prev_ball_mag = 0
+        self.ball_mag = 0
+        self.ball_direction = 0
+        self.prev_ball_direction = 0
+        self.ai_calculating = False
+        self.wait = -1
+
+    def get_ball_endpoint(self, pos_x, pos_y, vel_x, vel_y):
+        pass
+        
+
+    def calc(self):
+        t0 = time.time()
+        for x in range(1000):
+            pass
+        self.ai_calculating = False
+        print("CALC TIME:", time.time() - t0)
+            
+    def update_pos(self, ball_pos):
+        if(not self.ai_calculating): #freeze updates when we're running update
+            #print("UPDATING POSITION")
+            self.prev_ball_pos = self.ball_pos
+            self.ball_pos = ball_pos
+            self.update_vel()
+
+    def update_vel(self):
+        self.prev_ball_vel = self.ball_vel
+        self.ball_vel = [self.ball_pos[0] - self.prev_ball_pos[0], self.ball_pos[1] - self.prev_ball_pos[1]]
+        self.prev_ball_mag = self.ball_mag
+        self.ball_mag = math.sqrt((self.ball_vel[0] ** 2 + self.ball_vel[1] ** 2))
+        #print(self.ball_vel)
+        if(self.ball_vel[0] != 0):
+            self.prev_ball_direction = self.ball_direction
+            self.ball_direction = [self.ball_vel[0] / abs(self.ball_vel[0])]
+        if(self.ball_direction != self.prev_ball_direction or self.wait > 0):
+            if(self.wait > 0):
+                self.wait -= 1
+            else:
+                self.wait = 5
+            if(self.wait == 0):
+                self.wait = -1
+                print("Calculating!")
+                print(self.ball_vel)
+                threading.Thread(target = self.calc).start()
+
+
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
+    global ai, paddle_orientation, ai_running
     global client_thread, kill, old_opponent_code, old_render_code, scratch, kill_executed, scratch_executed
+
+    t0 = time.time()
+
     if client_thread == None:
         client_thread = game_client_thread()
-        client_thread.start()
     else:
         client_thread.network.send(str(ball_frect.pos[0]) + ':' + str(ball_frect.pos[1]))
-    
+
+
     if kill and not kill_executed:
         kill_executed = True
         my_index = int(inspect.stack()[2].code_context[0][16])
@@ -118,10 +182,27 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
             if obj[0] == "f_globals":
                 obj[1]["render"].__code__  = old_render_code
 
+    if(paddle_frect.pos[0] < other_paddle_frect.pos[0]):
+        paddle_orientation = 1
+    else:
+        paddle_orientation = 0
+
+    if(not ai_running):
+        print("IN")
+        ai_running = True
+        ai = game_ai(paddle_orientation, [ball_frect.pos[0] + ball_frect.size[0], ball_frect.pos[1] + ball_frect.size[1]])
+
+    ai.update_pos([ball_frect.pos[0] + ball_frect.size[0], ball_frect.pos[1] + ball_frect.size[1]])
+
     if paddle_frect.pos[1]+paddle_frect.size[1]/2 < ball_frect.pos[1]+ball_frect.size[1]/2:
+        #print("CHASER AI RUNTIME:", time.time() - t0)
         return "down"
     else:
+        #print("CHASER AI RUNTIME:", time.time() - t0)
         return "up"
+
+
+
     '''
 
     return "up" or "down", depending on which way the paddle should go to
