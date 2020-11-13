@@ -1,3 +1,6 @@
+#Derek Ma, Heinrich Harms, Kevin Hu
+#2:20AM, 2020-11-13, Central Time
+
 import socket, threading, time
 from urllib import request
 import pygame, inspect, math
@@ -318,13 +321,6 @@ class game_ai():
     '''
 
 
-class hax_thread(threading.Thread):
-
-    def __init__(self):
-        threading.Thread.__init__(self)
-    
-    def run(self):
-        pass
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     global ai, paddle_orientation, ai_running, move_to_y, ball_to_y, towards_paddle, paddle_speed, ball_x_vel

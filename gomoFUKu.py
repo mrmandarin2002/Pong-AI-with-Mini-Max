@@ -20,9 +20,9 @@ def is_bounded(board, y_end, x_end, length, d_y, d_x):
     right_closed, left_closed = False, False
     left_cor_x = x_end - d_x * length
     left_cor_y = y_end - d_y * length
-    if(7 < y_end + d_y < 0 or 7 < x_end + d_x < 0 or board[y_end + d_y][x_end + d_x] != ' '):
+    if(7 < y_end + d_y or y_end + d_y < 0 or 7 < x_end + d_x or x_end + d_x < 0 or board[y_end + d_y][x_end + d_x] != ' '):
         right_closed = True
-    if(7 < left_cor_x < 0 or 7 < left_cor_y < 0 or board[left_cor_y][left_cor_x] != ' '):
+    if(7 < left_cor_x or left_cor_x < 0 or 7 < left_cor_y or left_cor_y < 0 or board[left_cor_y][left_cor_x] != ' '):
         left_closed = True
     if(not left_closed and not right_closed):
         return "OPEN"
@@ -31,6 +31,20 @@ def is_bounded(board, y_end, x_end, length, d_y, d_x):
     else:
         return "CLOSED"
     
+#test_boards
+test_board1 = [[' ', 'w', ' ', ' ', ' ', ' ', ' ', ' '], 
+                [' ', 'w', ' ', ' ', ' ', ' ', ' ', ' '], 
+                [' ', 'w', ' ', ' ', ' ', ' ', ' ', ' '], 
+                [' ', 'w', ' ', ' ', ' ', ' ', ' ', ' '], 
+                [' ', 'w', ' ', ' ', ' ', ' ', ' ', ' '], 
+                [' ', 'w', ' ', ' ', ' ', ' ', ' ', ' '], 
+                [' ', 'w', ' ', ' ', ' ', ' ', ' ', ' '], 
+                [' ', 'w', ' ', ' ', ' ', ' ', ' ', ' ']
+            ]
+
+print("TEST: ", is_bounded(test_board1, 7, 1, 8, 1, 0))
+
+
 #aLWaYs TeSt CoDE YEEEEEEEEEEEEEEEEEEEE
 def detect_row(board, color, y_start, x_start, length, d_y, d_x):
     open_seq_count, semi_open_seq_count = 0, 0
