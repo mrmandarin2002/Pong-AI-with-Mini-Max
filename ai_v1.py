@@ -1,3 +1,6 @@
+#Derek Ma, Heinrich Harms, Kevin Hu
+#2:20AM, 2020-11-13, Central Time
+
 import socket, threading, time
 from urllib import request
 import pygame, inspect, math

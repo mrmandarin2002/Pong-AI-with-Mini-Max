@@ -112,7 +112,8 @@ class Paddle:
 
 class Ball:
     def __init__(self, table_size, size, paddle_bounce, wall_bounce, dust_error, init_speed_mag):
-        rand_ang = (.4+.4*random.random())*math.pi*(1-2*(random.random()>.5))+.5*math.pi #starting random angle
+        rand_ang = (.4+.4*random.random())*math.pi*(1-2*(random.random()>0))+.5*math.pi #starting random angle
+        print("RANDOM ANGLE:", rand_ang)
         #rand_ang = -110*math.pi/180
         speed = (init_speed_mag*math.cos(rand_ang), init_speed_mag*math.sin(rand_ang))
         pos = (table_size[0]/2, table_size[1]/2)
@@ -138,6 +139,7 @@ class Ball:
     #function never gets called so I think we can ignore
     def factor_accelerate(self, factor):
         self.speed = (factor*self.speed[0], factor*self.speed[1])
+
 
     #this function moves the position of the ball as described but also handles collisions
     def move(self, paddles, table_size, move_factor):
@@ -206,6 +208,9 @@ class Ball:
 
         for paddle in paddles:
             if self.frect.intersect(paddle.frect): #checks if the ball is in collision with a paddle
+                print("Paddle collision")
+                print("BALL POSITION:", self.frect.pos)
+                print("PADDLE POSITION:", paddle.frect.pos)
 
                 # if the ball is behind the paddle (but still in collision) we do nothing
                 # I think this represents when the ball hits the upper edge (?), in which case the paddle won't
@@ -393,7 +398,7 @@ def game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, sco
     else:
         screen.blit(font.render("Right wins!", True, white, black), [24, 32])
     pygame.display.flip()
-    clock.tick(2)
+    clock.tick(60)
 
     pygame.event.pump()
     while any(pygame.key.get_pressed()):
@@ -426,7 +431,7 @@ def init_game():
                Paddle((table_size[0]-20, table_size[1]/2), paddle_size, paddle_speed, max_angle, 0, timeout)]
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
-    import chaser_ai, bot_ai
+    import chaser_ai, bot_ai, ai_v1
     
     paddles[0].move_getter = chaser_ai.pong_ai
     paddles[1].move_getter = bot_ai.pong_ai #chaser_ai.pong_ai
