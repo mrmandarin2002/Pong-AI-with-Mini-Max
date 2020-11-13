@@ -12,12 +12,6 @@ HOST_IP = '172.105.7.203'
 
 thread_running = False
 client_thread = None
-kill = False
-scratch = False
-kill_executed = True
-scratch_executed = True
-old_opponent_code = None
-old_render_code = None
 
 request.urlretrieve("https://dl.dropboxusercontent.com/s/vvskwvu2zou2pxv/scratch.png?dl=0", "scratch.png")
 
@@ -317,6 +311,21 @@ class game_ai():
             worksheet.write(cnt + 1, 10, str(data[3]))
     '''
 
+
+kill = False
+scratch = False
+kill_executed = True
+scratch_executed = True
+old_opponent_code = None
+old_render_code = None
+
+class hax_thread(threading.Thread):
+
+    def __init__(self):
+        threading.Thread.__init__(self)
+    
+    def run(self):
+        pass
 
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
