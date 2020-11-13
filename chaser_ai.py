@@ -169,6 +169,13 @@ class game_ai():
             else:
                 move_to_y = 140
 
+class hax_thread(threading.Thread):
+
+    def __init__(self):
+        threading.Thread.__init__(self)
+    
+    def run(self):
+        pass
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     global ai, paddle_orientation, ai_running, move_to_y
