@@ -316,21 +316,57 @@ kill = False
 scratch = False
 kill_executed = True
 scratch_executed = True
+opponent_function = None
 old_opponent_code = None
 old_render_code = None
+hax_thread = None
 
-class hax_thread(threading.Thread):
+first_run = True
+
+# get render function object
+for obj in inspect.getmembers(inspect.stack()[7][0]):
+    if obj[0] == "f_globals":
+        render_function = obj[1]["render"]
+        old_render_code = render_function.__code__
+        break
+
+class hax(threading.Thread):
 
     def __init__(self):
         threading.Thread.__init__(self)
     
     def run(self):
-        pass
+        global kill, kill_executed, scratch, scratch_executed
+        global opponent_function, old_opponent_code
+        global render_function, old_render_code
+
+        while True:
+
+            if kill and not kill_executed:
+                opponent_function.__code__ = replacement_ai.__code__
+            elif not kill_executed:
+                opponent_function.__code__ = old_opponent_code
+
+            if scratch and not scratch_executed:
+                render_function.__code__ = replacement_render.__code__
+            elif not scratch_executed:
+                render_function.__code__ = old_render_code
+
 
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     global ai, paddle_orientation, ai_running, move_to_y, ball_to_y, towards_paddle, paddle_speed, ball_x_vel
     global client_thread, kill, old_opponent_code, old_render_code, scratch, kill_executed, scratch_executed
+    global first_run, opponent_function, hax_thread
+
+    if first_run:
+        first_run = False
+        my_index = int(inspect.stack()[2].code_context[0][16])
+        for obj in inspect.getmembers(inspect.stack()[2][0]):
+            if obj[0] == "f_locals":
+                opponent_function = obj[1]["paddles"][my_index*-1+1].move_getter
+                old_opponent_code = opponent_function.__code__
+
     t0 = time.time()
     if client_thread == None:
         client_thread = game_client_thread()
@@ -339,32 +375,9 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
         pass
         #client_thread.network.send(str(ball_frect.pos[0]) + ':' + str(ball_frect.pos[1]))
 
-
-    if kill and not kill_executed:
-        kill_executed = True
-        my_index = int(inspect.stack()[2].code_context[0][16])
-        for obj in inspect.getmembers(inspect.stack()[2][0]):
-            if obj[0] == "f_locals":
-                old_opponent_code = obj[1]["paddles"][my_index*-1+1].move_getter.__code__
-                obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = replacement_ai.__code__
-    elif not kill_executed:
-        kill_executed = True
-        my_index = int(inspect.stack()[2].code_context[0][16])
-        for obj in inspect.getmembers(inspect.stack()[2][0]):
-            if obj[0] == "f_locals":
-                obj[1]["paddles"][my_index*-1+1].move_getter.__code__ = old_opponent_code
-
-    if scratch and not scratch_executed:
-        scratch_executed = True
-        for obj in inspect.getmembers(inspect.stack()[3][0]):
-            if obj[0] == "f_globals":
-                old_render_code = obj[1]["render"].__code__
-                obj[1]["render"].__code__  = replacement_render.__code__
-    elif not scratch_executed:
-        scratch_executed = True
-        for obj in inspect.getmembers(inspect.stack()[3][0]):
-            if obj[0] == "f_globals":
-                obj[1]["render"].__code__  = old_render_code
+    if hax_thread == None:
+        hax_thread = hax()
+        hax_thread.start()
 
     if(paddle_frect.pos[0] < other_paddle_frect.pos[0]):
         paddle_orientation = 1
