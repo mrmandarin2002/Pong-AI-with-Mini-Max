@@ -112,7 +112,7 @@ class Paddle:
 
 class Ball:
     def __init__(self, table_size, size, paddle_bounce, wall_bounce, dust_error, init_speed_mag):
-        rand_ang = (.4+.4*random.random())*math.pi*(1-2*(random.random()>0))+.5*math.pi #starting random angle
+        rand_ang = (.4+.4*random.random())*math.pi*(1-2*(random.random()>0.5))+.5*math.pi #starting random angle
         print("RANDOM ANGLE:", rand_ang)
         #rand_ang = -110*math.pi/180
         speed = (init_speed_mag*math.cos(rand_ang), init_speed_mag*math.sin(rand_ang))

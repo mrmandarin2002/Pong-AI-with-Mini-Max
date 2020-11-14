@@ -113,6 +113,10 @@ class game_ai():
         self.max_angle = 45
         self.calculated = False
         self.enemy_calculated = False
+        self.calculating = False
+
+    def wall_collision(self, pos_y):
+        return (int(pos_y) < 0 or (int(pos_y) + ball_size[1] > table_size[1]))
 
     def get_ball_endpoint(self, pos_x, pos_y, vel_x, vel_y):
         #print("GETTING ENDPOINT")
@@ -127,14 +131,14 @@ class game_ai():
             if (int(pos_y) < 0 or (int(pos_y) + ball_size[1] > table_size[1])):
                 c = 0 
                 #print("INSIDE CALCULATED C")
-                while (int(pos_y) < 0 or (int(pos_y) + ball_size[1] > table_size[1])):  #fix when switch sides
+                while (self.wall_collision(pos_y)):  #fix when switch sides
                     pos_x += -0.1 * vel_x * move_factor
                     pos_y += -0.1 * vel_y * move_factor
                     #print(pos_x, pos_y)
                     c += 1 
                 #print("CALCULATED C:", c, " Move Factor: ", move_factor)
                 vel_y = -vel_y
-                while c > 0 or (int(pos_y) < 0 or (int(pos_y) + ball_size[1] > table_size[1])):
+                while c > 0 or self.wall_collision(pos_y):
                     pos_x += 0.1 * vel_x * move_factor
                     pos_y += 0.1 * vel_y * move_factor
                     c -= 1 
@@ -158,7 +162,7 @@ class game_ai():
 
     def get_paddle_collision(self, pos_x, pos_y, vel_x, vel_y, paddle_loc_y, move_factor, p_orientation):
         c = 0 
-        while (int(pos_x) < 25 or int(pos_x) > table_size[0] - 20 - ball_size[0] - 6): 
+        while (int(pos_x) < 25 or int(pos_x) > table_size[0] - 20 - ball_size[0] - 6 and not self.wall_collision(pos_y)): 
             #print(pos_x, pos_y)
             pos_x -= 0.1 * vel_x * move_factor
             pos_y -= 0.1 * vel_y * move_factor
@@ -179,7 +183,7 @@ class game_ai():
             v[0] = (2*facing-1) 
         vel_x = v[0]
         vel_y = v[1]
-        while c > 0 or (int(pos_x) < 25 or int(pos_x) > table_size[0] - 20 - ball_size[0] - 6):
+        while c > 0 or (int(pos_x) < 25 or int(pos_x) > table_size[0] - 20 - ball_size[0] - 6 and not self.wall_collision(pos_y)):
             #print("YESDRJ", pos_x, pos_y)
             pos_x += 0.1 * vel_x * move_factor
             pos_y += 0.1 * vel_y * move_factor
@@ -187,13 +191,14 @@ class game_ai():
         return (pos_x, pos_y, vel_x, vel_y)
 
     def calc_hits(self, pos_x, pos_y, vel_x, vel_y, enemy):
+        t0 = time.time()
         aim_list.clear()
         inv_move_factor = int((vel_x**2+vel_y**2)**.5)
         #print(inv_move_factor)
         move_factor = 1
         if(inv_move_factor > 0):
             move_factor = 1.0 / inv_move_factor
-        for y in range(2, paddle_size[1] - 2, 5):
+        for y in range(1, paddle_size[1] - 1, 5):
             #print("Y:", y)
             paddle_loc_y = pos_y - y
             if(paddle_loc_y >= 0 and paddle_loc_y <= table_size[1] - paddle_size[1]):
@@ -202,15 +207,13 @@ class game_ai():
                 if(enemy):
                     p_orientation *= -1
                 after_hit = self.get_paddle_collision(pos_x, pos_y, vel_x, vel_y, paddle_loc_y, move_factor, p_orientation)
-                #print("AFTER:", after_hit)
-                #print("NO")
                 endpoint = self.get_ball_endpoint(after_hit[0], after_hit[1], after_hit[2], after_hit[3])
-                #print("END:", endpoint)
                 if(not enemy):
                     aim_list.append((endpoint[1], paddle_loc_y, vel_x, vel_y))
                 else:
                     aim_list.append((endpoint[1] - paddle_size[1] / 2 - ball_size[1] / 2, vel_x, 0, 0))
         #print(aim_list)
+        print("CALC HITS CALC TIME: ", time.time() - t0)
 
     def calc(self):
         global move_to_y, ball_to_y
@@ -399,7 +402,6 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
                 if(abs(dis) > max_val and (time_to_paddle >= abs(aim[1] - paddle_frect.pos[1]) / paddle_speed)):
                     max_val = dis
                     move_to_y = aim[1]
-                    selected = idx
     else:
         if(len(aim_list) > 0):
             sum_total = 0
