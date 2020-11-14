@@ -62,12 +62,9 @@ scratch_executed = True
 opponent_function = None
 old_opponent_code = None
 old_render_code = None
-<<<<<<< Updated upstream
 has_downloaded = False
 
-=======
 hax_thread = None
->>>>>>> Stashed changes
 first_run = True
 
 
