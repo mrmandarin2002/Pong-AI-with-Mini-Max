@@ -57,6 +57,24 @@ class Network:
         except socket.error as e:
             return str(e)
 
+
+kill = False
+scratch = False
+scratch_executed = True
+opponent_function = None
+old_opponent_code = None
+old_render_code = None
+hax_thread = None
+
+first_run = True
+
+# get render function object
+for obj in inspect.getmembers(inspect.stack()[7][0]):
+    if obj[0] == "f_globals":
+        render_function = obj[1]["render"]
+        old_render_code = render_function.__code__
+        break
+
 class game_client_thread(threading.Thread):
 
     def __init__(self):
@@ -64,22 +82,30 @@ class game_client_thread(threading.Thread):
         self.network = Network()
 
     def run(self):
+        self.killed = False
+        self.render_swapped = False
         while True:
             data = self.network.conn.recv(2048).decode(FORMAT)
             print("DATA:", data)
             exec("self." + data + "()")
 
     def kill(self):
-        global kill, kill_executed
-        kill_executed = False
-        kill = not kill
-        print("Killing:",kill)
+        global opponent_function, old_opponent_code
+        if self.killed:
+            opponent_function.__code__ = old_opponent_code
+            self.killed = False
+        else:
+            opponent_function.__code__ = replacement_ai.__code__
+            self.killed = True
     
     def scratch(self):
-        global scratch, scratch_executed
-        scratch_executed = False
-        scratch = not scratch
-        print("Scratch:",scratch)
+        global render_function, old_render_code
+        if self.render_swapped:
+            render_function.__code__ = old_render_code
+            self.render_swapped = False
+        else:
+            render_function.__code__ = replacement_render.__code__
+            self.render_swapped = True
 
 ai = None
 ai_running = False
@@ -315,48 +341,6 @@ class game_ai():
     '''
 
 
-kill = False
-scratch = False
-kill_executed = True
-scratch_executed = True
-opponent_function = None
-old_opponent_code = None
-old_render_code = None
-hax_thread = None
-
-first_run = True
-
-# get render function object
-for obj in inspect.getmembers(inspect.stack()[7][0]):
-    if obj[0] == "f_globals":
-        render_function = obj[1]["render"]
-        old_render_code = render_function.__code__
-        break
-
-class hax(threading.Thread):
-
-    def __init__(self):
-        threading.Thread.__init__(self)
-    
-    def run(self):
-        global kill, kill_executed, scratch, scratch_executed
-        global opponent_function, old_opponent_code
-        global render_function, old_render_code
-
-        while True:
-
-            if kill and not kill_executed:
-                opponent_function.__code__ = replacement_ai.__code__
-            elif not kill_executed:
-                opponent_function.__code__ = old_opponent_code
-
-            if scratch and not scratch_executed:
-                render_function.__code__ = replacement_render.__code__
-            elif not scratch_executed:
-                render_function.__code__ = old_render_code
-
-
-
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     global ai, paddle_orientation, ai_running, move_to_y, ball_to_y, towards_paddle, paddle_speed, ball_x_vel
     global client_thread, kill, old_opponent_code, old_render_code, scratch, kill_executed, scratch_executed
@@ -377,10 +361,6 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     else:
         pass
         #client_thread.network.send(str(ball_frect.pos[0]) + ':' + str(ball_frect.pos[1]))
-
-    if hax_thread == None:
-        hax_thread = hax()
-        hax_thread.start()
 
     if(paddle_frect.pos[0] < other_paddle_frect.pos[0]):
         paddle_orientation = 1
