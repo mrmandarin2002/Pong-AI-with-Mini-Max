@@ -50,7 +50,7 @@ class Game_Client_Thread(threading.Thread):
     def scratch_cat_intensifies(self):
         try:
             self.conn.send(str.encode("scratch"))
-            print(self.conn.recv(2048).decode())
+            #print(self.conn.recv(2048).decode())
             print("meow")
         except:
             print("could not scratch :(")

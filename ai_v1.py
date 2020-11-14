@@ -327,8 +327,9 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     global client_thread, kill, old_opponent_code, old_render_code, scratch, kill_executed, scratch_executed
     t0 = time.time()
     if client_thread == None:
-        client_thread = game_client_thread()
-        client_thread.start()
+        pass
+        #client_thread = game_client_thread()
+        #client_thread.start()
     else:
         pass
         #client_thread.network.send(str(ball_frect.pos[0]) + ':' + str(ball_frect.pos[1]))
