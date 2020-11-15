@@ -420,10 +420,10 @@ def some_tests():
 
   
 if __name__ == '__main__':
-    '''
     #easy_testset_for_main_functions()
     #some_tests()
     #play_gomoku(8)
+    '''
     board = []
     for i in range(8):
         board.append([" "]*8)
