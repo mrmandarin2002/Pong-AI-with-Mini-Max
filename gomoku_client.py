@@ -56,7 +56,7 @@ class client(tk.Tk):
             #this below is absolutely disgusting code but just let it be, man's on a time crunch
             yeee = ('w', 'b')
             try:
-                gomoku.put_seq_on_board(board, randint(0, 7), randint(0, 7), randint(-1, 1), randint(0, 1), randint(2, 6), yeee[randint(0,1)])
+                gomoku.put_seq_on_board(board, randint(0, 7), randint(0, 7), randint(-1, 1), randint(0, 1), randint(2, 5), yeee[randint(0,1)])
             except:
                 i -= 1
         return board
@@ -69,9 +69,14 @@ class client(tk.Tk):
         print("GENERATED BOARD:")
         board = self.generate_random_board()
         gomoku.print_board(board)
-        analysis = self.network.get_analysis(board)
+        print("HERE'S YOUR ANALYSIS:")
+        gomoku.analysis(board)
+        print("-------------------------------")
+        analysis = json.loads(self.network.get_analysis(board))
         print("HERE'S MRMANDARINS ANALYSIS:")
-        print(analysis)
+        for a in analysis:
+            print(a)
+        print('\n')
         
         
 BLUE = "#DFF9FB"

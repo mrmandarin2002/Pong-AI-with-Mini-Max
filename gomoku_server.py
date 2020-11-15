@@ -31,13 +31,19 @@ class Client_Thread(threading.Thread):
 
     def run(self):
         while True:
-            data = self.conn.recv(2048).decode(FORMAT).split(':')
-            if(data[0] == 'A'):
-                board = json.loads(data[1])
-                print("Requested Analysis for board: \n", gomoFUKu.print_board(board))
-                analysis = gomoFUKu.analysis(board)
-                print("Here's the analysis: \n", analysis)
-                self.conn.send(str.encode(json.dumps(analysis)))
+            try:
+                data = self.conn.recv(2048).decode(FORMAT).split(':')
+                if(data[0] == 'A'):
+                    board = json.loads(data[1])
+                    print("Requested Analysis for board: \n")
+                    gomoFUKu.print_board(board)
+                    analysis = gomoFUKu.analysis(board)
+                    print("Here's the analysis: \n")
+                    for a in analysis:
+                        print(a)
+                    self.conn.send(str.encode(json.dumps(analysis)))
+            except:
+                print(f"Something with {self.addr} went wrong!")
 
 while True:
     conn, addr = s.accept()
