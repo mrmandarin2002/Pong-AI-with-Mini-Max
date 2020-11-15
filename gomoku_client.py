@@ -12,7 +12,7 @@ HOST_IP = '172.105.7.203' #hey those trying to hack my server! there ain't shit 
 
 class Network:
 
-    def __init__(self, file_name):
+    def __init__(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.host = HOST_IP 
         self.addr = (self.host, PORT)

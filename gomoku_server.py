@@ -48,8 +48,8 @@ while True:
         conn, addr = s.accept()
         print(f"Connection with {addr} established!")
         conn.send(str.encode("Connection with MrMandarin's Server established!"))
-        game_clients.append(Client_Thread(addr, conn))
-        game_clients[len(game_clients) - 1].start()
+        clients.append(Client_Thread(addr, conn))
+        clients[len(game_clients) - 1].start()
     except:
         print("FUCK CONNECTION ISSUE")
 
