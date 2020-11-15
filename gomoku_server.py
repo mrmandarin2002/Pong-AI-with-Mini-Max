@@ -20,6 +20,7 @@ except socket.error as e:
 s.listen(2)
 print("Waiting for a connection")
 
+
 clients = []
 
 class Client_Thread(threading.Thread):
@@ -30,25 +31,37 @@ class Client_Thread(threading.Thread):
         self.conn = conn
 
     def run(self):
+        cnt = 0
         while True:
-            try:
-                data = self.conn.recv(2048).decode(FORMAT).split(':')
-                if(data[0] == 'A'):
-                    board = json.loads(data[1])
-                    print("Requested Analysis for board: \n")
-                    gomoFUKu.print_board(board)
-                    analysis = gomoFUKu.analysis(board)
-                    print("Here's the analysis: \n")
-                    for a in analysis:
-                        print(a)
-                    self.conn.send(str.encode(json.dumps(analysis)))
-            except:
-                print(f"Something with {self.addr} went wrong!")
+            cnt += 1
+            if(cnt < 10000):
+                try:
+                    data = self.conn.recv(2048).decode(FORMAT).split(':')
+                    print(f"Received Data From {self.addr}")
+                    if(data[0] == 'A'):
+                        board = json.loads(data[1])
+                        print("Requested Analysis for board: \n")
+                        gomoFUKu.print_board(board)
+                        analysis = gomoFUKu.analysis(board)
+                        print("Here's the analysis: \n")
+                        for a in analysis:
+                            print(a)
+                        self.conn.send(str.encode(json.dumps(analysis)))
+                        cnt = 0
+                except:
+                    print(f"Something with {self.addr} went wrong!")
+                    break
+            else:
+                print("INFINITE LOOP!")
+                break
 
 while True:
-    conn, addr = s.accept()
-    print(f"Connection with {addr} established!")
-    conn.send(str.encode("Connection with MrMandarin's Server established!"))
-    clients.append(Client_Thread(addr, conn))
-    clients[len(clients) - 1].start()
+    try:
+        conn, addr = s.accept()
+        print(f"Connection with {addr} established!")
+        conn.send(str.encode("Connection with MrMandarin's Server established!"))
+        clients.append(Client_Thread(addr, conn))
+        clients[len(clients) - 1].start()
+    except:
+        print("Error Connecting")
 

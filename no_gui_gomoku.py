@@ -83,9 +83,5 @@ class client():
         for a in analysis:
             print(a)
         print('\n')
-        
-        
-BLUE = "#DFF9FB"
-
 root = client()
 root.run()
