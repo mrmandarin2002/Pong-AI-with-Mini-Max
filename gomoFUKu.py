@@ -200,6 +200,7 @@ def analysis(board):
     return_value = []
     for c, full_name in [["b", "Black"], ["w", "White"]]:
         print("%s stones" % (full_name))
+        return_value.append(str("%s stones" % (full_name)))
         for i in range(2, 6):
             open, semi_open = detect_rows(board, c, i);
             print("Open rows of length %d: %d" % (i, open))
