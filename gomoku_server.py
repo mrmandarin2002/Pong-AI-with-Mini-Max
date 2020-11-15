@@ -37,7 +37,7 @@ class Client_Thread(threading.Thread):
                 print("Requested Analysis for board: \n", gomoFUKu.print_board(board))
                 analysis = gomoFUKu.analysis(board)
                 print("Here's the analysis: \n", analysis)
-                self.conn.send(str.encode(analysis))
+                self.conn.send(str.encode(json.dumps(analysis)))
 
 while True:
     conn, addr = s.accept()

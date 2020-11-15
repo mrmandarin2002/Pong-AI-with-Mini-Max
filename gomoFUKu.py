@@ -197,12 +197,17 @@ def make_empty_board(sz):
     return board
 
 def analysis(board):
+    return_value = []
     for c, full_name in [["b", "Black"], ["w", "White"]]:
         print("%s stones" % (full_name))
         for i in range(2, 6):
             open, semi_open = detect_rows(board, c, i);
             print("Open rows of length %d: %d" % (i, open))
             print("Semi-open rows of length %d: %d" % (i, semi_open))
+            return_value.append(str("Open rows of length %d: %d" % (i, open)))
+            return_value.append(str("Semi-open rows of length %d: %d" % (i, semi_open)))
+    return return_value
+    
         
 def play_gomoku(board_size):
     board = make_empty_board(board_size)
@@ -420,10 +425,11 @@ def some_tests():
 
   
 if __name__ == '__main__':
-    '''
+    pass
     #easy_testset_for_main_functions()
     #some_tests()
     #play_gomoku(8)
+    '''
     board = []
     for i in range(8):
         board.append([" "]*8)
@@ -448,7 +454,7 @@ if __name__ == '__main__':
     put_seq_on_board(board, 3, 5, 1, 1, 3, "b")
     put_seq_on_board(board, 1, 4, 0, 1, 2, "b")
     print_board(board)
-    analysis(board)
+    print(analysis(board))
     
     print("DETECT ROW: ", detect_row(board, 'b', 6, 0, 2, -1, 1))
     '''
