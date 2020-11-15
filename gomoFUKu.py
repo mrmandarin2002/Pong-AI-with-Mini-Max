@@ -15,55 +15,76 @@ def is_empty(board):
             if(box != ' '):
                 return False
     return True
+
+def check_within_bounds(y, x):
+    if(y >= 0 and y <= 7 and x >= 0 and x <= 7):
+        return True
+    else:
+        return False
     
 def is_bounded(board, y_end, x_end, length, d_y, d_x):
     right_closed, left_closed = False, False
     left_cor_x = x_end - d_x * length
     left_cor_y = y_end - d_y * length
-    if(7 < y_end + d_y or y_end + d_y < 0 or 7 < x_end + d_x or x_end + d_x < 0 or board[y_end + d_y][x_end + d_x] != ' '):
+    if(not check_within_bounds(y_end + d_y, x_end + d_x) or board[y_end + d_y][x_end + d_x] != ' '):
         right_closed = True
-    if(7 < left_cor_x or left_cor_x < 0 or 7 < left_cor_y or left_cor_y < 0 or board[left_cor_y][left_cor_x] != ' '):
+    if(not check_within_bounds(left_cor_y, left_cor_x) or board[left_cor_y][left_cor_x] != ' '):
         left_closed = True
     if(not left_closed and not right_closed):
         return "OPEN"
     elif(left_closed != right_closed):
+        if(length == 2 and board[y_end][x_end] == 'b'):
+            print(y_end, x_end, d_y, d_x)
         return "SEMIOPEN"
     else:
         return "CLOSED"
     
 #test_boards
-test_board1 = [[' ', 'w', ' ', ' ', ' ', ' ', ' ', ' '], 
-                [' ', 'w', ' ', ' ', ' ', ' ', ' ', ' '], 
-                [' ', 'w', ' ', ' ', ' ', ' ', ' ', ' '], 
-                [' ', 'w', ' ', ' ', ' ', ' ', ' ', ' '], 
-                [' ', 'w', ' ', ' ', ' ', ' ', ' ', ' '], 
-                [' ', 'w', ' ', ' ', ' ', ' ', ' ', ' '], 
-                [' ', 'w', ' ', ' ', ' ', ' ', ' ', ' '], 
-                [' ', 'w', ' ', ' ', ' ', ' ', ' ', ' ']
+test_board1 = [[' ', ' ', ' ', ' ', ' ', ' ', 'b', ' '], 
+                [' ', ' ', ' ', ' ', ' ', 'b', ' ', ' '], 
+                [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '], 
+                [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '], 
+                [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '], 
+                [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '], 
+                ['b', 'b', ' ', ' ', ' ', ' ', ' ', ' '], 
+                [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
             ]
 
-print("TEST: ", is_bounded(test_board1, 7, 1, 8, 1, 0))
-
+#print("TEST: ", is_bounded(test_board1, 7, 1, 8, 1, 0))
 
 #aLWaYs TeSt CoDE YEEEEEEEEEEEEEEEEEEEE
 def detect_row(board, color, y_start, x_start, length, d_y, d_x):
     open_seq_count, semi_open_seq_count = 0, 0
+    if(color == 'b'):
+        pass
+        #print(y_start, x_start, d_y, d_x, "LENGTH:", length)
     r_idx = 0
     piece_cnt = 0
-    while(r_idx < len(board)):
-        right_cor = (y_start + d_y * r_idx, x_start + d_x * r_idx)
+    right_cor =  (y_start + d_y * r_idx, x_start + d_x * r_idx)
+    while(7 >= right_cor[0] >= 0 and 7 >= right_cor[1] >= 0):
+        #print(right_cor)
         if(board[right_cor[0]][right_cor[1]] == color):
             piece_cnt += 1
         if(r_idx >= length - 1):
-            if(piece_cnt == length):
+            #makes sure that the sequence is not actually larger
+            check = True
+            left_cor = (right_cor[0] - d_y * (length - 1), right_cor[1] - d_x * (length - 1))
+            #print("RIGHT COR:", right_cor)
+            #print("LEFT_COR:", left_cor)
+            if(check_within_bounds(right_cor[0] + d_y, right_cor[1] + d_x) and board[right_cor[0] + d_y][right_cor[1] + d_x] == color):
+                check = False
+            elif(check_within_bounds(left_cor[0] - d_y, left_cor[1] - d_x) and board[left_cor[0] - d_y][left_cor[1] - d_x] == color):
+                check = False
+            if(piece_cnt == length and check):
                 seq_status = is_bounded(board, right_cor[0], right_cor[1], length, d_y, d_x)
                 if(seq_status == "OPEN"):
                     open_seq_count += 1
                 elif(seq_status == "SEMIOPEN"):
                     semi_open_seq_count += 1
-            left_cor = (right_cor[0] - d_y * (length - 1), right_cor[1] - d_x * (length - 1))
             if(board[left_cor[0]][left_cor[1]] == color):
                 piece_cnt -= 1
+        r_idx += 1
+        right_cor = (y_start + d_y * r_idx, x_start + d_x * r_idx)
     return open_seq_count, semi_open_seq_count
     
 def sum_lists(list1, list2):
@@ -84,11 +105,10 @@ def detect_rows(board, color, length):
         ### why the actual fuck is x referring to cols and y referring to rows ?????????
         if(i != 0): #so we don't count the same diagonals twice
             seq_cnt = sum_lists(seq_cnt, detect_row(board, color, i, 0, length, 1, 1))
-            seq_cnt = sum_lists(seq_cnt, detect_row(board, color, i, len(board, - 1), length, -1, 1))
+
+            seq_cnt = sum_lists(seq_cnt, detect_row(board, color, len(board) - 1 - i, 0, length, -1, 1))
 
     return seq_cnt[0], seq_cnt[1]
-
-
     
 def search_max(board):
     cor = [-1, -1]
@@ -118,9 +138,9 @@ def is_win(board):
     white_cnt = detect_rows(board, 'w', 5)
     black_cnt = detect_rows(board, 'b', 5)
     if(white_cnt[0] != 0 or white_cnt[1] != 0):
-        return "White"
+        return "White won"
     elif(black_cnt[0] != 0 or black_cnt[1] != 0):
-        return "Black"
+        return "Black won"
     else:
         return "Continue Playing"
     
@@ -400,5 +420,33 @@ def some_tests():
 
   
 if __name__ == '__main__':
-    easy_testset_for_main_functions()
-    play_gomoku(8)
+    #easy_testset_for_main_functions()
+    #some_tests()
+    #play_gomoku(8)
+    board = []
+    for i in range(8):
+        board.append([" "]*8)
+    put_seq_on_board(board, 0, 0, 0, 1, 1, "w")
+    put_seq_on_board(board, 1, 1, 0, 1, 2, "w")
+    put_seq_on_board(board, 3, 6, 0, 1, 1, "w")
+    put_seq_on_board(board, 0, 3, 0, 1, 3, "w")
+    put_seq_on_board(board, 6, 6, 0, 1, 1, "w")
+    put_seq_on_board(board, 2, 3, 1, 1, 3, "w")
+    put_seq_on_board(board, 7, 4, 0, 1, 4, "w")
+    put_seq_on_board(board, 2, 5, 0, 1, 2, "w")
+    put_seq_on_board(board, 5, 2, 1, 1, 2, "w")
+    put_seq_on_board(board, 7, 0, 0, 1, 1, "b")
+    put_seq_on_board(board, 0, 6, 0, 1, 1, "b")
+    put_seq_on_board(board, 7, 2, 0, 1, 2, "b")
+    put_seq_on_board(board, 2, 2, 1, 1, 4, "b")
+    put_seq_on_board(board, 3, 2, 1, 1, 3, "b")
+    put_seq_on_board(board, 3, 1, 1, 1, 3, "b")
+    put_seq_on_board(board, 0, 7, 1, 0, 3, "b")
+    put_seq_on_board(board, 6, 0, 0, 1, 2, "b")
+    put_seq_on_board(board, 2, 0, 1, 0, 3, "b")
+    put_seq_on_board(board, 3, 5, 1, 1, 3, "b")
+    put_seq_on_board(board, 1, 4, 0, 1, 2, "b")
+    print_board(board)
+    analysis(board)
+    
+    print("DETECT ROW: ", detect_row(board, 'b', 6, 0, 2, -1, 1))

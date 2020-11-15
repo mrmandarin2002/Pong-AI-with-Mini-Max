@@ -62,12 +62,9 @@ scratch_executed = True
 opponent_function = None
 old_opponent_code = None
 old_render_code = None
-<<<<<<< Updated upstream
 has_downloaded = False
 
-=======
 hax_thread = None
->>>>>>> Stashed changes
 first_run = True
 
 
@@ -234,7 +231,7 @@ class game_ai():
         move_factor = 1
         if(inv_move_factor > 0):
             move_factor = 1.0 / inv_move_factor
-        for y in range(1, paddle_size[1] - 1, 4):
+        for y in range(4, paddle_size[1] - 4, 3):
             #print("Y:", y)
             paddle_loc_y = pos_y - y
             if(paddle_loc_y >= 0 and paddle_loc_y <= table_size[1] - paddle_size[1]):
