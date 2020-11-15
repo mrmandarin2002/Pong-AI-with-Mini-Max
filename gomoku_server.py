@@ -31,22 +31,18 @@ class Client_Thread(threading.Thread):
 
     def run(self):
         while True:
-            try:
-                data = self.conn.recv(2048).decode(FORMAT).split(':')
-                if(data[0] == 'A'):
-                    board = json.loads(data[1])
-                    print("Requested Analysis for board: \n", gomoFUKu.print_board(board))
-                    analysis = gomoFUKu.analysis(board)
-                    print("Here's the analysis: \n", analysis)
-                    self.conn.send(str.encode(analysis))
-            except:
-                print(f"AN ERROR HAS OCCURED WITH ADDR: {self.addr}!")
-                break
+            data = self.conn.recv(2048).decode(FORMAT).split(':')
+            if(data[0] == 'A'):
+                board = json.loads(data[1])
+                print("Requested Analysis for board: \n", gomoFUKu.print_board(board))
+                analysis = gomoFUKu.analysis(board)
+                print("Here's the analysis: \n", analysis)
+                self.conn.send(str.encode(analysis))
 
 while True:
     conn, addr = s.accept()
     print(f"Connection with {addr} established!")
     conn.send(str.encode("Connection with MrMandarin's Server established!"))
     clients.append(Client_Thread(addr, conn))
-    clients[len(game_clients) - 1].start()
+    clients[len(clients) - 1].start()
 
