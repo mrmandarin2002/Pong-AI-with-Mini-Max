@@ -109,10 +109,7 @@ def detect_row_returns_closed(board, color, y_start, x_start, length, d_y, d_x):
             elif(check_within_bounds(left_cor[0] - d_y, left_cor[1] - d_x) and board[left_cor[0] - d_y][left_cor[1] - d_x] == color):
                 check = False
             if(piece_cnt == length and check):
-                seq_status = is_bounded(board, right_cor[0], right_cor[1], length, d_y, d_x)
-                if(seq_status == "CLOSED"):
-                    closed_seq_count += 1
-                
+                closed_seq_count += 1
             if(board[left_cor[0]][left_cor[1]] == color):
                 piece_cnt -= 1
         r_idx += 1
