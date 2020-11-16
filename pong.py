@@ -75,7 +75,6 @@ class Paddle:
     def factor_accelerate(self, factor):
         self.speed = factor*self.speed
 
-
     def move(self, enemy_frect, ball_frect, table_size):
         direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
         #direction = timeout(self.move_getter, (self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size)), {}, self.timeout)
@@ -106,9 +105,6 @@ class Paddle:
         sign = 1-2*self.facing
 
         return sign*rel_dist_from_c*self.max_angle*math.pi/180
-
-
-
 
 
 class Ball:

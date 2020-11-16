@@ -154,22 +154,17 @@ class game_ai():
     def get_ball_endpoint(self, pos_x, pos_y, vel_x, vel_y):
         #print("GETTING ENDPOINT")
         inv_move_factor = int((vel_x**2+vel_y**2)**.5)
-        #print(inv_move_factor)
         move_factor = 1
         if(inv_move_factor > 0):
             move_factor = 1.0 / inv_move_factor
-        calculated_pos_list.clear()
         while(int(pos_x) > 24 and int(pos_x) < table_size[0] - 20 - ball_size[0] - 5):
-            calculated_pos_list.append((pos_x, pos_y, vel_x, vel_y))
             if (int(pos_y) < 0 or (int(pos_y) + ball_size[1] > table_size[1])):
                 c = 0 
-                #print("INSIDE CALCULATED C")
-                while (self.wall_collision(pos_y)):  #fix when switch sides
+                while (self.wall_collision(pos_y)):  
                     pos_x += -0.1 * vel_x * move_factor
                     pos_y += -0.1 * vel_y * move_factor
                     #print(pos_x, pos_y)
                     c += 1 
-                #print("CALCULATED C:", c, " Move Factor: ", move_factor)
                 vel_y = -vel_y
                 while c > 0 or self.wall_collision(pos_y):
                     pos_x += 0.1 * vel_x * move_factor

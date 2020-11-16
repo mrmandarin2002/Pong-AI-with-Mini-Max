@@ -21,7 +21,7 @@ def check_within_bounds(y, x):
         return True
     else:
         return False
-    
+        
 def is_bounded(board, y_end, x_end, length, d_y, d_x):
     right_closed, left_closed = False, False
     left_cor_x = x_end - d_x * length
@@ -33,12 +33,10 @@ def is_bounded(board, y_end, x_end, length, d_y, d_x):
     if(not left_closed and not right_closed):
         return "OPEN"
     elif(left_closed != right_closed):
-        if(length == 2 and board[y_end][x_end] == 'b'):
-            print(y_end, x_end, d_y, d_x)
         return "SEMIOPEN"
     else:
         return "CLOSED"
-    
+        
 #test_boards
 test_board1 = [[' ', ' ', ' ', ' ', ' ', ' ', 'b', ' '], 
                 [' ', ' ', ' ', ' ', ' ', 'b', ' ', ' '], 
@@ -52,8 +50,12 @@ test_board1 = [[' ', ' ', ' ', ' ', ' ', ' ', 'b', ' '],
 
 #print("TEST: ", is_bounded(test_board1, 7, 1, 8, 1, 0))
 
+white_closed = 0
+black_closed = 0
+
 #aLWaYs TeSt CoDE YEEEEEEEEEEEEEEEEEEEE
 def detect_row(board, color, y_start, x_start, length, d_y, d_x):
+    global white_closed, black_closed
     open_seq_count, semi_open_seq_count = 0, 0
     if(color == 'b'):
         pass
@@ -81,6 +83,11 @@ def detect_row(board, color, y_start, x_start, length, d_y, d_x):
                     open_seq_count += 1
                 elif(seq_status == "SEMIOPEN"):
                     semi_open_seq_count += 1
+                else:
+                    if(color == 'w'):
+                        white_closed += 1
+                    else:
+                        black_closed += 1
             if(board[left_cor[0]][left_cor[1]] == color):
                 piece_cnt -= 1
         r_idx += 1
@@ -133,13 +140,16 @@ def is_full(board):
     return cnt == len(board) ** 2
 
 def is_win(board):
+    global white_closed, black_closed
+    white_closed = 0
+    black_closed = 0
     if(is_full(board)):
         return "Draw"
     white_cnt = detect_rows(board, 'w', 5)
     black_cnt = detect_rows(board, 'b', 5)
-    if(white_cnt[0] != 0 or white_cnt[1] != 0):
+    if(white_cnt[0] != 0 or white_cnt[1] != 0 or white_closed > 0):
         return "White won"
-    elif(black_cnt[0] != 0 or black_cnt[1] != 0):
+    elif(black_cnt[0] != 0 or black_cnt[1] != 0 or black_closed > 0):
         return "Black won"
     else:
         return "Continue Playing"
@@ -424,9 +434,38 @@ def some_tests():
     #        Open rows of length 5: 0
     #        Semi-open rows of length 5: 0
 
-  
+'''
+def testing_win_5_closed():
+    board = make_empty_board(8)
+    board[2][2] = "w"
+    y = 3;
+    x = 2;
+    d_x = 0;
+    d_y = 1;
+    length = 5
+    put_seq_on_board(board, y, x, d_y, d_x, length, "b")
+    print_board(board)
+    if is_win(board)=="Black won":
+        print("PASSSSSSSSS")
+    else:
+        print("EPIC FAIL :(")
+        # Expected output:
+        # *0|1|2|3|4|5|6|7*
+        # 0 | | | | | | | *
+        # 1 | | | | | | | *
+        # 2 | |w| | | | | *
+        # 3 | |b| | | | | *
+        # 4 | |b| | | | | *
+        # 5 | |b| | | | | *
+        # 6 | |b| | | | | *
+        # 7 | |b| | | | | *
+        # *****************
+        # PASSSSSSSSS
+'''
+
 if __name__ == '__main__':
     pass
+    #testing_win_5_closed()
     #easy_testset_for_main_functions()
     #some_tests()
     #play_gomoku(8)
@@ -455,7 +494,5 @@ if __name__ == '__main__':
     put_seq_on_board(board, 3, 5, 1, 1, 3, "b")
     put_seq_on_board(board, 1, 4, 0, 1, 2, "b")
     print_board(board)
-    print(analysis(board))
-    
-    print("DETECT ROW: ", detect_row(board, 'b', 6, 0, 2, -1, 1))
+    analysis(board)
     '''
