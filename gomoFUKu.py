@@ -100,16 +100,10 @@ def detect_row_returns_closed(board, color, y_start, x_start, length, d_y, d_x):
             piece_cnt += 1
         if(r_idx >= length - 1):
             #makes sure that the sequence is not actually larger
-            check = True
             left_cor = (right_cor[0] - d_y * (length - 1), right_cor[1] - d_x * (length - 1))
-            #print("RIGHT COR:", right_cor)
-            #print("LEFT_COR:", left_cor)
-            if(check_within_bounds(right_cor[0] + d_y, right_cor[1] + d_x) and board[right_cor[0] + d_y][right_cor[1] + d_x] == color):
-                check = False
-            elif(check_within_bounds(left_cor[0] - d_y, left_cor[1] - d_x) and board[left_cor[0] - d_y][left_cor[1] - d_x] == color):
-                check = False
-            if(piece_cnt == length and check):
+            if(piece_cnt == length):
                 closed_seq_count += 1
+                
             if(board[left_cor[0]][left_cor[1]] == color):
                 piece_cnt -= 1
         r_idx += 1
