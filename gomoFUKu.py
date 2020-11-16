@@ -195,7 +195,7 @@ def is_win(board):
     elif(black_cnt != 0):
         return "Black won"
     else:
-        return "Continue Playing"
+        return "Continue playing"
     
 def score(board):
     MAX_SCORE = 100000
