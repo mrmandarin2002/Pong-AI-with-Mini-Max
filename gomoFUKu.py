@@ -55,7 +55,6 @@ black_closed = 0
 
 #aLWaYs TeSt CoDE YEEEEEEEEEEEEEEEEEEEE
 def detect_row(board, color, y_start, x_start, length, d_y, d_x):
-    global white_closed, black_closed
     open_seq_count, semi_open_seq_count = 0, 0
     if(color == 'b'):
         pass
@@ -83,16 +82,43 @@ def detect_row(board, color, y_start, x_start, length, d_y, d_x):
                     open_seq_count += 1
                 elif(seq_status == "SEMIOPEN"):
                     semi_open_seq_count += 1
-                else:
-                    if(color == 'w'):
-                        white_closed += 1
-                    else:
-                        black_closed += 1
             if(board[left_cor[0]][left_cor[1]] == color):
                 piece_cnt -= 1
         r_idx += 1
         right_cor = (y_start + d_y * r_idx, x_start + d_x * r_idx)
     return open_seq_count, semi_open_seq_count
+
+def detect_row_returns_closed(board, color, y_start, x_start, length, d_y, d_x):
+    closed_seq_count = 0
+    r_idx = 0
+    piece_cnt = 0
+    right_cor =  (y_start + d_y * r_idx, x_start + d_x * r_idx)
+
+    while(7 >= right_cor[0] >= 0 and 7 >= right_cor[1] >= 0):
+        #print(right_cor)
+        if(board[right_cor[0]][right_cor[1]] == color):
+            piece_cnt += 1
+        if(r_idx >= length - 1):
+            #makes sure that the sequence is not actually larger
+            check = True
+            left_cor = (right_cor[0] - d_y * (length - 1), right_cor[1] - d_x * (length - 1))
+            #print("RIGHT COR:", right_cor)
+            #print("LEFT_COR:", left_cor)
+            if(check_within_bounds(right_cor[0] + d_y, right_cor[1] + d_x) and board[right_cor[0] + d_y][right_cor[1] + d_x] == color):
+                check = False
+            elif(check_within_bounds(left_cor[0] - d_y, left_cor[1] - d_x) and board[left_cor[0] - d_y][left_cor[1] - d_x] == color):
+                check = False
+            if(piece_cnt == length and check):
+                seq_status = is_bounded(board, right_cor[0], right_cor[1], length, d_y, d_x)
+                if(seq_status == "CLOSED"):
+                    closed_seq_count += 1
+                
+            if(board[left_cor[0]][left_cor[1]] == color):
+                piece_cnt -= 1
+        r_idx += 1
+        right_cor = (y_start + d_y * r_idx, x_start + d_x * r_idx)
+    return closed_seq_count
+
     
 def sum_lists(list1, list2):
     return [x + y for x, y in zip(list1, list2)]
@@ -140,19 +166,47 @@ def is_full(board):
     return cnt == len(board) ** 2
 
 def is_win(board):
-    global white_closed, black_closed
-    white_closed = 0
-    black_closed = 0
     if(is_full(board)):
         return "Draw"
-    white_cnt = detect_rows(board, 'w', 5)
-    black_cnt = detect_rows(board, 'b', 5)
-    if(white_cnt[0] != 0 or white_cnt[1] != 0 or white_closed > 0):
-        return "White won"
-    elif(black_cnt[0] != 0 or black_cnt[1] != 0 or black_closed > 0):
-        return "Black won"
-    else:
-        return "Continue Playing"
+    # iterate through (1, 0) columns with y = 0, x = 0-7 
+    for x in range(0, len(board)):
+        if detect_row_returns_closed(board, "w", 0, x, 5, 1, 0) > 0:
+            return "White won"
+        if detect_row_returns_closed(board, "b", 0, x, 5, 1, 0) > 0:
+            return "Black won"
+    # iterate through (0, 1) rows with y = 0-7, x = 0
+    for y in range(0, 8):
+        if detect_row_returns_closed(board, "w", y, 0, 5, 0, 1) > 0:
+            return "White won"
+        if detect_row_returns_closed(board, "b", y, 0, 5, 0, 1) > 0:
+            return "Black won"
+    # iterate through (1, 1) diagonals with y = 0-7, x = 0-7
+    # start from left side
+    for y in range(0, 8):
+        if detect_row_returns_closed(board, "w", y, 0, 5, 1, 1) > 0:
+            return "White won"
+        if detect_row_returns_closed(board, "b", y, 0, 5, 1, 1) > 0:
+            return "Black won"
+    # start from top side, don't go through long diagonal again
+    for x in range(1, 8):
+        if detect_row_returns_closed(board, "w", 0, x, 5, 1, 1) > 0:
+            return "White won"
+        if detect_row_returns_closed(board, "b", 0, x, 5, 1, 1) > 0:
+            return "Black won"
+    # iterate through (1, -1) diagonals with y = 0-7, x = 0-7
+    # start from right side
+    for y in range(0, 8):
+        if detect_row_returns_closed(board, "w", y, 7, 5, 1, -1) > 0:
+            return "White won"
+        if detect_row_returns_closed(board, "b", y, 7, 5, 1, -1) > 0:
+            return "Black won"
+    # start from top side, don't go through long diagonal again
+    for x in range(0, 8):
+        if detect_row_returns_closed(board, "w", 0, x, 5, 1, -1) > 0:
+            return "White won"
+        if detect_row_returns_closed(board, "b", 0, x, 5, 1, -1) > 0:
+            return "Black won"
+    return "Continue Playing"
     
 def score(board):
     MAX_SCORE = 100000

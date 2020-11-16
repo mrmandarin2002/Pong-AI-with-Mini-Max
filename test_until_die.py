@@ -65,7 +65,7 @@ class client():
         yourAnalysis = []
         serverAnalysis = []
         board = None
-        correct_counter = -1
+        correct_counter = 0
 
         while yourAnalysis == serverAnalysis:
             correct_counter += 1

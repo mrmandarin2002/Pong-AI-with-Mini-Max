@@ -222,7 +222,7 @@ def detect_row(board, color, y_start, x_start, length, d_y, d_x):
     r_idx = 0
     piece_cnt = 0
     right_cor =  (y_start + d_y * r_idx, x_start + d_x * r_idx)
-    while(7 >= right_cor[0] >= 0 and 7 >= right_cor[1] >= 0):
+    while(reading_of_boundaries(right_cor[0], right_cor[1])):
         if(board[right_cor[0]][right_cor[1]] == color):
             piece_cnt += 1
         if(r_idx >= length - 1):

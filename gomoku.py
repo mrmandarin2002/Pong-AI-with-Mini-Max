@@ -55,43 +55,36 @@ black_closed = 0
 
 #aLWaYs TeSt CoDE YEEEEEEEEEEEEEEEEEEEE
 def detect_row(board, color, y_start, x_start, length, d_y, d_x):
-    global white_closed, black_closed
     open_seq_count, semi_open_seq_count = 0, 0
-    if(color == 'b'):
-        pass
-        #print(y_start, x_start, d_y, d_x, "LENGTH:", length)
-    r_idx = 0
+    cnt = 0
     piece_cnt = 0
-    right_cor =  (y_start + d_y * r_idx, x_start + d_x * r_idx)
+    right_cor =  (y_start, x_start)
     while(7 >= right_cor[0] >= 0 and 7 >= right_cor[1] >= 0):
-        #print(right_cor)
+        
         if(board[right_cor[0]][right_cor[1]] == color):
             piece_cnt += 1
-        if(r_idx >= length - 1):
-            #makes sure that the sequence is not actually larger
+
+        if(cnt >= length - 1):
             check = True
             left_cor = (right_cor[0] - d_y * (length - 1), right_cor[1] - d_x * (length - 1))
-            #print("RIGHT COR:", right_cor)
-            #print("LEFT_COR:", left_cor)
+
+            #lines below checks if the sequence is complete or not
             if(check_within_bounds(right_cor[0] + d_y, right_cor[1] + d_x) and board[right_cor[0] + d_y][right_cor[1] + d_x] == color):
                 check = False
             elif(check_within_bounds(left_cor[0] - d_y, left_cor[1] - d_x) and board[left_cor[0] - d_y][left_cor[1] - d_x] == color):
                 check = False
+
+            #if it's a sequence
             if(piece_cnt == length and check):
                 seq_status = is_bounded(board, right_cor[0], right_cor[1], length, d_y, d_x)
                 if(seq_status == "OPEN"):
                     open_seq_count += 1
                 elif(seq_status == "SEMIOPEN"):
                     semi_open_seq_count += 1
-                else:
-                    if(color == 'w'):
-                        white_closed += 1
-                    else:
-                        black_closed += 1
             if(board[left_cor[0]][left_cor[1]] == color):
                 piece_cnt -= 1
-        r_idx += 1
-        right_cor = (y_start + d_y * r_idx, x_start + d_x * r_idx)
+        cnt += 1
+        right_cor = (y_start + d_y * cnt, x_start + d_x * cnt)
     return open_seq_count, semi_open_seq_count
     
 def sum_lists(list1, list2):

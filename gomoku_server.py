@@ -41,12 +41,17 @@ class Client_Thread(threading.Thread):
                     if(data[0] == 'A'):
                         board = json.loads(data[1])
                         print("Requested Analysis for board: \n")
-                        gomoFUKu.print_board(board)
+                        #gomoFUKu.print_board(board)
                         analysis = gomoFUKu.analysis(board)
-                        print("Here's the analysis: \n")
-                        for a in analysis:
-                            print(a)
+                        #print("Here's the analysis: \n")
+                        #for a in analysis:
+                        #    print(a)
                         self.conn.send(str.encode(json.dumps(analysis)))
+                        cnt = 0
+                    elif(data[0] == 'W'):
+                        board = json.loads(data[1])
+                        print("Requested Win: \n")
+                        self.conn.send(str.encode(gomoFUKu.is_win(board)))
                         cnt = 0
                 except:
                     print(f"Something with {self.addr} went wrong!")
