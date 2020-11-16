@@ -91,7 +91,7 @@ class client():
         board = self.generate_random_board()
         correct_cnt = 0
 
-        while(gomoku.is_win(board) == self.network.get_win(board)):
+        while(gomoku.is_win(board) == self.network.get_win(board) or self.network.get_win(board) == "Impossible"):
             print(gomoku.is_win(board))
             print(self.network.get_win(board))
             correct_cnt += 1
@@ -111,6 +111,7 @@ class client():
 
 
     def compare_win(self):
+        print("Impossible refers to when both white and black have winning sequences, this will not be tested.")
         print("GENERATED BOARD:")
         board = self.generate_random_board()
         gomoku.print_board(board)

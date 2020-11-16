@@ -108,7 +108,10 @@ def detect_row_returns_closed(board, color, y_start, x_start, length, d_y, d_x):
             elif(check_within_bounds(left_cor[0] - d_y, left_cor[1] - d_x) and board[left_cor[0] - d_y][left_cor[1] - d_x] == color):
                 check = False
             if(piece_cnt == length and check):
+                #print("ANS: ", right_cor)
                 seq_count += 1
+            if(board[left_cor[0]][left_cor[1]] == color):
+                piece_cnt -= 1
         r_idx += 1
         right_cor = (y_start + d_y * r_idx, x_start + d_x * r_idx)
     return seq_count
@@ -182,7 +185,9 @@ def is_win(board):
     if(is_full(board)):
         return "Draw"
     white_cnt = detect_rows_win(board, 'w', 5)
+    #print(white_cnt)
     black_cnt = detect_rows_win(board, 'b', 5)
+    #print(black_cnt)
     if(black_cnt != 0 and white_cnt != 0): #remove this line for gradescope submission
         return "Impossible"
     if(white_cnt != 0):
@@ -502,7 +507,18 @@ def testing_win_5_closed():
 
 
 if __name__ == '__main__':
-    testing_win_5_closed()
+    #testing_win_5_closed()
+    case_1 = [
+        [' ', ' ', 'w', 'w', 'w', ' ', 'b', 'b'],
+        ['w', 'w', 'w', 'w', 'w', 'b', 'b', ' '],
+        ['w', 'w', ' ', ' ', 'b', ' ', 'b', 'b'],
+        ['w', ' ', ' ', 'b', ' ', 'w', 'b', ' '],
+        [' ', 'b', 'w', ' ', 'w', 'w', 'w', 'b'],
+        ['b', ' ', 'w', 'w', ' ', 'w', 'b', ' '],
+        ['b', ' ', 'w', 'w', ' ', 'b', 'w', ' '],
+        [' ', ' ', 'w', ' ', 'b', 'w', 'w', 'w']
+    ]
+    print(is_win(case_1))
     pass
     #easy_testset_for_main_functions()
     #some_tests()
