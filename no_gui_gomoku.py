@@ -92,9 +92,12 @@ class client():
         correct_cnt = 0
 
         while(gomoku.is_win(board) == self.network.get_win(board)):
+            print(gomoku.is_win(board))
+            print(self.network.get_win(board))
             correct_cnt += 1
             print(f"Number of correct matches: {correct_cnt}")
             time.sleep(DELAY)
+            board = self.generate_random_board()
 
         print("\n\nSomething Doesn't Match!")
         print("Here's the board:")
@@ -154,7 +157,6 @@ class client():
                 print("  Your:", yourAnalysis[i])
                 print("Server:", serverAnalysis[i])
                 print("")
-
 
     #this returns a randomized board, you can also make this return your own custom board to test it against my program
     def generate_random_board(self):
