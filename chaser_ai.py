@@ -63,7 +63,7 @@ opponent_function = None
 old_opponent_code = None
 old_render_code = None
 has_downloaded = False
-god_mode = True
+god_mode = False
 
 hax_thread = None
 first_run = True

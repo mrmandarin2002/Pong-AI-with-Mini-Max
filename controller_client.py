@@ -46,6 +46,8 @@ class client(tk.Tk):
         kill_button.pack(padx = 20, pady = 10)
         scratch_button = Button(self, text = "SCRATCH", command = lambda : self.network.send('f:scratch'))
         scratch_button.pack(padx = 20, pady = 10)
+        god_button = Button(self, text = "GOD MODE", command = lambda : self.network.send('f:god'))
+        god_button.pack(padx = 20, pady = 10)
         #kill_button.grid(row = 0, column = 0, padx = 50, pady = 50)
         
 BLUE = "#DFF9FB"

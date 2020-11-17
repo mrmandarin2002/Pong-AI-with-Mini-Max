@@ -55,14 +55,12 @@ class Game_Client_Thread(threading.Thread):
         except:
             print("could not scratch :(")
 
-    def keyboard_control(self):
-        pass
-
-    def cannon(self):
-        pass
-
-    def wall(self):
-        pass
+    def god(self):
+        try:
+            self.conn.send(str.encode("god"))
+            print("GOD INTENSIFIES")
+        except:
+            print("NO GOD")
 
     def sleep(self):
         pass

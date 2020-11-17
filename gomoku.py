@@ -97,11 +97,11 @@ def detect_row(board, col, y_start, x_start, length, d_y, d_x):
 
         left_cor_y = right_cor_y - d_y * (length - 1)
         left_cor_x = right_cor_x - d_x * (length - 1)
+
         if board[right_cor_y][right_cor_x] == col:
             colour_cnt += 1
 
         if pos >= length - 1:
-
             is_complete_sequence = True
 
             #check right side for complete sequence
