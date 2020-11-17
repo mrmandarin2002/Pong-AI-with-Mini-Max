@@ -85,6 +85,8 @@ class Controller_Client_Thread(threading.Thread):
                         self.conn.send(str.encode(str(client.kill())))
                     if(data[1] == 'scratch'):
                         self.conn.send(str.encode(str(client.scratch_cat_intensifies())))
+                    if(data[1] == 'god'):
+                        self.conn.send(str.encode(str(client.god())))
 
 thread_cnt = 1
 
