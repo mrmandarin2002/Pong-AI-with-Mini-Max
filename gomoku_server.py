@@ -1,5 +1,5 @@
 from datetime import datetime
-import socket, sys, threading, json
+import socket, sys, threading, json, time
 import gomoFUKu
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -63,10 +63,12 @@ class Client_Thread(threading.Thread):
 while True:
     try:
         conn, addr = s.accept()
+        print(conn, addr)
         print(f"Connection with {addr} established!")
         conn.send(str.encode("Connection with MrMandarin's Server established!"))
         clients.append(Client_Thread(addr, conn))
         clients[len(clients) - 1].start()
-    except:
+    except Exception as e:
+        print("ERROR MESSAGE: ", e)
         print("Error Connecting")
 

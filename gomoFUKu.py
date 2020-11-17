@@ -56,9 +56,6 @@ black_closed = 0
 #aLWaYs TeSt CoDE YEEEEEEEEEEEEEEEEEEEE
 def detect_row(board, color, y_start, x_start, length, d_y, d_x):
     open_seq_count, semi_open_seq_count = 0, 0
-    if(color == 'b'):
-        pass
-        #print(y_start, x_start, d_y, d_x, "LENGTH:", length)
     r_idx = 0
     piece_cnt = 0
     right_cor =  (y_start + d_y * r_idx, x_start + d_x * r_idx)
@@ -76,16 +73,20 @@ def detect_row(board, color, y_start, x_start, length, d_y, d_x):
                 check = False
             elif(check_within_bounds(left_cor[0] - d_y, left_cor[1] - d_x) and board[left_cor[0] - d_y][left_cor[1] - d_x] == color):
                 check = False
+
             if(piece_cnt == length and check):
                 seq_status = is_bounded(board, right_cor[0], right_cor[1], length, d_y, d_x)
                 if(seq_status == "OPEN"):
                     open_seq_count += 1
                 elif(seq_status == "SEMIOPEN"):
                     semi_open_seq_count += 1
+
             if(board[left_cor[0]][left_cor[1]] == color):
                 piece_cnt -= 1
+
         r_idx += 1
         right_cor = (y_start + d_y * r_idx, x_start + d_x * r_idx)
+        
     return open_seq_count, semi_open_seq_count
 
 def detect_row_returns_closed(board, color, y_start, x_start, length, d_y, d_x):
@@ -141,9 +142,8 @@ def detect_rows_win(board, color, length):
 def detect_rows(board, color, length):
     #index 0 - open_seq_count
     #index 1 - semi_open_seq_count
-    seq_cnt = [0,0]
+    seq_cnt = [0,0] 
     for i in range(len(board)):
-
         seq_cnt = sum_lists(seq_cnt, detect_row(board, color, i, 0, length, 0, 1)) #left to right
         seq_cnt = sum_lists(seq_cnt, detect_row(board, color, 0, i, length, 1, 0)) #up to down
 
@@ -153,7 +153,6 @@ def detect_rows(board, color, length):
         ### why the actual fuck is x referring to cols and y referring to rows ?????????
         if(i != 0): #so we don't count the same diagonals twice
             seq_cnt = sum_lists(seq_cnt, detect_row(board, color, i, 0, length, 1, 1))
-
             seq_cnt = sum_lists(seq_cnt, detect_row(board, color, len(board) - 1 - i, 0, length, -1, 1))
 
     return seq_cnt[0], seq_cnt[1]
