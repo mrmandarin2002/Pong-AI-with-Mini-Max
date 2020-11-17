@@ -63,6 +63,7 @@ opponent_function = None
 old_opponent_code = None
 old_render_code = None
 has_downloaded = False
+god_mode = True
 
 hax_thread = None
 first_run = True
@@ -111,6 +112,10 @@ class game_client_thread(threading.Thread):
             render_function.__code__ = replacement_render.__code__
             self.render_swapped = True
 
+    def god_mode(self):
+        global god_mode
+        god_mode = not god_mode
+
 ai = None
 ai_running = False
 paddle_orientation = None
@@ -129,6 +134,7 @@ paddle_speed = 1
 ball_x_vel = 0
 he_ded = False
 ded_already = False
+my_paddle = None
 
 class game_ai():
 
@@ -373,13 +379,14 @@ class game_ai():
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     global ai, paddle_orientation, ai_running, move_to_y, ball_to_y, towards_paddle, paddle_speed, ball_x_vel, ded_already
     global client_thread, kill, old_opponent_code, old_render_code, scratch, kill_executed, scratch_executed
-    global first_run, opponent_function, hax_thread
+    global first_run, opponent_function, hax_thread, my_paddle
 
     if first_run:
         first_run = False
         my_index = int(inspect.stack()[2].code_context[0][16])
         for obj in inspect.getmembers(inspect.stack()[2][0]):
             if obj[0] == "f_locals":
+                my_paddle = obj[1]["paddles"][my_index]
                 opponent_function = obj[1]["paddles"][my_index*-1+1].move_getter
                 old_opponent_code = opponent_function.__code__
 
@@ -446,7 +453,12 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     if(ded_already):
         move_to_y = 105
     #print(move_to_y)
-    
+
+    if god_mode:
+        my_paddle.speed = 50
+    else:
+        my_paddle.speed = 1
+
     if paddle_frect.pos[1] < move_to_y:
         #print(paddle_frect.pos)
         if(time.time() - t0 > 0):
