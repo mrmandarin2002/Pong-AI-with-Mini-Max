@@ -112,7 +112,7 @@ class game_client_thread(threading.Thread):
             render_function.__code__ = replacement_render.__code__
             self.render_swapped = True
 
-    def god_mode(self):
+    def god(self):
         global god_mode
         god_mode = not god_mode
 
