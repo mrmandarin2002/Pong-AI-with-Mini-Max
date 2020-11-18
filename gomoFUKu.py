@@ -58,7 +58,7 @@ def detect_row(board, color, y_start, x_start, length, d_y, d_x):
     open_seq_count, semi_open_seq_count = 0, 0
     r_idx = 0
     piece_cnt = 0
-    right_cor =  (y_start + d_y * r_idx, x_start + d_x * r_idx)
+    right_cor = (y_start, x_start)
     while(7 >= right_cor[0] >= 0 and 7 >= right_cor[1] >= 0):
         #print(right_cor)
         if(board[right_cor[0]][right_cor[1]] == color):
@@ -184,9 +184,7 @@ def is_win(board):
     if(is_full(board)):
         return "Draw"
     white_cnt = detect_rows_win(board, 'w', 5)
-    #print(white_cnt)
     black_cnt = detect_rows_win(board, 'b', 5)
-    #print(black_cnt)
     if(black_cnt != 0 and white_cnt != 0): #remove this line for gradescope submission
         return "Impossible"
     if(white_cnt != 0):
@@ -517,7 +515,7 @@ if __name__ == '__main__':
         ['b', ' ', 'w', 'w', ' ', 'b', 'w', ' '],
         [' ', ' ', 'w', ' ', 'b', 'w', 'w', 'w']
     ]
-    print(is_win(case_1))
+    print(test_search_max())
     pass
     #easy_testset_for_main_functions()
     #some_tests()

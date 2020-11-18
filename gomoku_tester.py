@@ -3,7 +3,7 @@
 import socket, threading, json, contextlib, io, time
 from random import *
 
-gomoku = __import__("gomoku") #put your filename here (pls for the love of god run this shit in the same folder as your file (and for the love of jesus do not pyzo this))
+gomoku = __import__("alex_gomoku") #put your filename here (pls for the love of god run this shit in the same folder as your file (and for the love of jesus do not pyzo this))
 
 HEADER = 16
 DELAY = 0.5 #hehehehe
@@ -44,6 +44,10 @@ class Network:
         self.client.send(str.encode('W:' + json.dumps(board)))
         return self.client.recv(2048).decode(FORMAT)
 
+    def get_search(self, board):
+        self.client.send(str.encode('S:' + json.dumps(board)))
+        return self.client.recv(2048).decode(FORMAT)
+
 class client():
 
     def __init__(self):
@@ -58,9 +62,10 @@ class client():
             print("2 - Continuously Analyse")
             print("3 - Check Win Once")
             print("4 - Continuously Check Win")
-            print("5 - Exit")
+            print("5 - Continously Check Search_Max")
+            print("6 - Exit")
             s = input()
-            if(s == '5'):
+            if(s == '6'):
                 not_ended = False
             elif(s == '1'):
                 self.analyze()
@@ -70,6 +75,8 @@ class client():
                 self.compare_win()
             elif(s == '4'):
                 self.continuous_win()
+            elif(s == '5'):
+                self.continuous_search_max()
             else:
                 print("Dafuq you entered boii")
 
@@ -109,6 +116,18 @@ class client():
         print(self.network.get_win(board))
         print('\n')
 
+    def continuous_search_max(self):
+        print("USE AT YOUR OWN RISK CUZ SCORE DO BE WHACK")
+        board = self.generate_random_board()
+        correct_cnt = 0
+
+        while(str(gomoku.search_max(board)) == self.network.get_search(board)):
+            print(str(gomoku.search_max(board)))
+            print(self.network.get_win(board))
+            correct_cnt += 1
+            print(f"Number of correct matches: {correct_cnt}")
+            time.sleep(DELAY)
+            board = self.generate_random_board()
 
     def compare_win(self):
         print("Impossible refers to when both white and black have winning sequences, this will not be tested.")

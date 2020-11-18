@@ -53,6 +53,11 @@ class Client_Thread(threading.Thread):
                         print("Requested Win: \n")
                         self.conn.send(str.encode(gomoFUKu.is_win(board)))
                         cnt = 0
+                    elif(data[0] == 'S'):
+                        board = json.loads(data[1])
+                        print("Requested Search: \n")
+                        self.conn.send(str.encode(gomoFUKu.search_max(board)))
+                        cnt = 0
                 except:
                     print(f"Something with {self.addr} went wrong!")
                     break
