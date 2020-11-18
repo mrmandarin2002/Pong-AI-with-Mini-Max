@@ -109,7 +109,6 @@ def detect_row_returns_closed(board, color, y_start, x_start, length, d_y, d_x):
             elif(check_within_bounds(left_cor[0] - d_y, left_cor[1] - d_x) and board[left_cor[0] - d_y][left_cor[1] - d_x] == color):
                 check = False
             if(piece_cnt == length and check):
-                #print("ANS: ", right_cor)
                 seq_count += 1
             if(board[left_cor[0]][left_cor[1]] == color):
                 piece_cnt -= 1
@@ -139,6 +138,7 @@ def detect_rows_win(board, color, length):
             seq_cnt += detect_row_returns_closed(board, color, len(board) - 1 - i, 0, length, -1, 1)
 
     return seq_cnt
+
 def detect_rows(board, color, length):
     #index 0 - open_seq_count
     #index 1 - semi_open_seq_count
@@ -156,7 +156,6 @@ def detect_rows(board, color, length):
             seq_cnt = sum_lists(seq_cnt, detect_row(board, color, len(board) - 1 - i, 0, length, -1, 1))
 
     return seq_cnt[0], seq_cnt[1]
-    
     
 def search_max(board):
     cor = [-1, -1]
@@ -249,12 +248,12 @@ def make_empty_board(sz):
 def analysis(board):
     return_value = []
     for c, full_name in [["b", "Black"], ["w", "White"]]:
-        print("%s stones" % (full_name))
+        #print("%s stones" % (full_name))
         return_value.append(str("%s stones" % (full_name)))
         for i in range(2, 6):
             open, semi_open = detect_rows(board, c, i);
-            print("Open rows of length %d: %d" % (i, open))
-            print("Semi-open rows of length %d: %d" % (i, semi_open))
+            #print("Open rows of length %d: %d" % (i, open))
+            #print("Semi-open rows of length %d: %d" % (i, semi_open))
             return_value.append(str("Open rows of length %d: %d" % (i, open)))
             return_value.append(str("Semi-open rows of length %d: %d" % (i, semi_open)))
     return return_value

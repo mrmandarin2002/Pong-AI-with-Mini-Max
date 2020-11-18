@@ -8,6 +8,7 @@ PORT = 5555
 SERVER = ''
 FORMAT = 'utf-8'
 HEADER = 2048
+DELAY = 0.05
 
 SERVER_IP = socket.gethostbyname(SERVER)
 
@@ -58,6 +59,7 @@ class Client_Thread(threading.Thread):
                         print("Requested Search: \n")
                         self.conn.send(str.encode(str(gomoFUKu.search_max(board))))
                         cnt = 0
+                    time.sleep(DELAY)
                 except Exception as e:
                     print("ERROR MESSAGE:", e)
                     print(f"Something with {self.addr} went wrong!")
