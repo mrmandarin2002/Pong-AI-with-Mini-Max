@@ -123,11 +123,19 @@ class client():
 
         while(str(gomoku.search_max(board)) == self.network.get_search(board)):
             print(str(gomoku.search_max(board)))
-            print(self.network.get_win(board))
+            print(self.network.get_search(board))
             correct_cnt += 1
             print(f"Number of correct matches: {correct_cnt}")
             time.sleep(DELAY)
             board = self.generate_random_board()
+
+        print("WE HAVE FOUND AN ERROR ^_^")
+        print("YOUR PROGRAM CLAIMS: ")
+        print(str(gomoku.search_max(board)))
+        print('-------------------------------')
+        print("MRMANDARINS'S PROGRAM CLAIMS:")
+        print(self.network.get_search(board))
+        print('\n')
 
     def compare_win(self):
         print("Impossible refers to when both white and black have winning sequences, this will not be tested.")
