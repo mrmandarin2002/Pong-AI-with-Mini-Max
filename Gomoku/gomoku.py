@@ -36,22 +36,6 @@ def is_bounded(board, y_end, x_end, length, d_y, d_x):
         return "SEMIOPEN"
     else:
         return "CLOSED"
-        
-#test_boards
-test_board1 = [[' ', ' ', ' ', ' ', ' ', ' ', 'b', ' '], 
-                [' ', ' ', ' ', ' ', ' ', 'b', ' ', ' '], 
-                [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '], 
-                [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '], 
-                [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '], 
-                [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '], 
-                ['b', 'b', ' ', ' ', ' ', ' ', ' ', ' '], 
-                [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ']
-            ]
-
-#print("TEST: ", is_bounded(test_board1, 7, 1, 8, 1, 0))
-
-white_closed = 0
-black_closed = 0
 
 #aLWaYs TeSt CoDE YEEEEEEEEEEEEEEEEEEEE
 def detect_row(board, color, y_start, x_start, length, d_y, d_x):
@@ -139,6 +123,7 @@ def detect_rows_win(board, color, length):
             seq_cnt += detect_row_returns_closed(board, color, len(board) - 1 - i, 0, length, -1, 1)
 
     return seq_cnt
+
 def detect_rows(board, color, length):
     #index 0 - open_seq_count
     #index 1 - semi_open_seq_count
@@ -173,24 +158,21 @@ def search_max(board):
     return cor[0], cor[1]
 
 def is_full(board):
-    cnt = 0
     for y in range(len(board)):
         for x in range(len(board)):
             if(board[y][x] == ' '):
-                cnt += 1
-    return cnt == len(board) ** 2
+                return False
+    return True
 
 def is_win(board):
-    if(is_full(board)):
-        return "Draw"
     white_cnt = detect_rows_win(board, 'w', 5)
     black_cnt = detect_rows_win(board, 'b', 5)
-    if(black_cnt != 0 and white_cnt != 0): #remove this line for gradescope submission
-        return "Impossible"
     if(white_cnt != 0):
         return "White won"
     elif(black_cnt != 0):
         return "Black won"
+    elif(is_full(board)):
+        return "Draw"
     else:
         return "Continue playing"
     
@@ -475,75 +457,5 @@ def some_tests():
     #        Semi-open rows of length 5: 0
 
 
-def testing_win_5_closed():
-    board = make_empty_board(8)
-    board[2][2] = "w"
-    y = 3;
-    x = 2;
-    d_x = 0;
-    d_y = 1;
-    length = 5
-    put_seq_on_board(board, y, x, d_y, d_x, length, "b")
-    print_board(board)
-    if is_win(board)=="Black won":
-        print("PASSSSSSSSS")
-    else:
-        print("EPIC FAIL :(")
-        # Expected output:
-        # *0|1|2|3|4|5|6|7*
-        # 0 | | | | | | | *
-        # 1 | | | | | | | *
-        # 2 | |w| | | | | *
-        # 3 | |b| | | | | *
-        # 4 | |b| | | | | *
-        # 5 | |b| | | | | *
-        # 6 | |b| | | | | *
-        # 7 | |b| | | | | *
-        # *****************
-        # PASSSSSSSSS
-
-
 if __name__ == '__main__':
-    #testing_win_5_closed()
-    case_1 = [
-        [' ', ' ', 'w', 'w', 'w', ' ', 'b', 'b'],
-        ['w', 'w', 'w', 'w', 'w', 'b', 'b', ' '],
-        ['w', 'w', ' ', ' ', 'b', ' ', 'b', 'b'],
-        ['w', ' ', ' ', 'b', ' ', 'w', 'b', ' '],
-        [' ', 'b', 'w', ' ', 'w', 'w', 'w', 'b'],
-        ['b', ' ', 'w', 'w', ' ', 'w', 'b', ' '],
-        ['b', ' ', 'w', 'w', ' ', 'b', 'w', ' '],
-        [' ', ' ', 'w', ' ', 'b', 'w', 'w', 'w']
-    ]
-    #print(test_search_max())
     pass
-    #easy_testset_for_main_functions()
-    #some_tests()
-    #play_gomoku(8)
-    '''
-    board = []
-    for i in range(8):
-        board.append([" "]*8)
-    put_seq_on_board(board, 0, 0, 0, 1, 1, "w")
-    put_seq_on_board(board, 1, 1, 0, 1, 2, "w")
-    put_seq_on_board(board, 3, 6, 0, 1, 1, "w")
-    put_seq_on_board(board, 0, 3, 0, 1, 3, "w")
-    put_seq_on_board(board, 6, 6, 0, 1, 1, "w")
-    put_seq_on_board(board, 2, 3, 1, 1, 3, "w")
-    put_seq_on_board(board, 7, 4, 0, 1, 4, "w")
-    put_seq_on_board(board, 2, 5, 0, 1, 2, "w")
-    put_seq_on_board(board, 5, 2, 1, 1, 2, "w")
-    put_seq_on_board(board, 7, 0, 0, 1, 1, "b")
-    put_seq_on_board(board, 0, 6, 0, 1, 1, "b")
-    put_seq_on_board(board, 7, 2, 0, 1, 2, "b")
-    put_seq_on_board(board, 2, 2, 1, 1, 4, "b")
-    put_seq_on_board(board, 3, 2, 1, 1, 3, "b")
-    put_seq_on_board(board, 3, 1, 1, 1, 3, "b")
-    put_seq_on_board(board, 0, 7, 1, 0, 3, "b")
-    put_seq_on_board(board, 6, 0, 0, 1, 2, "b")
-    put_seq_on_board(board, 2, 0, 1, 0, 3, "b")
-    put_seq_on_board(board, 3, 5, 1, 1, 3, "b")
-    put_seq_on_board(board, 1, 4, 0, 1, 2, "b")
-    print_board(board)
-    analysis(board)
-    '''

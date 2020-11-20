@@ -3,7 +3,7 @@
 import socket, threading, json, contextlib, io, time
 from random import *
 
-gomoku = __import__("aly_gomoku") #put your filename here (pls for the love of god run this shit in the same folder as your file (and for the love of jesus do not pyzo this))
+gomoku = __import__("gomoku") #put your filename here (pls for the love of god run this shit in the same folder as your file (and for the love of jesus do not pyzo this))
 
 HEADER = 16
 DELAY = 0.0 #hehehehe
@@ -42,8 +42,7 @@ class Network:
 
     def get_search(self, board):
         self.client.send(str.encode('S:' + json.dumps(board)))
-        return json.loads(self.client.recv(2048).decode(FORMAT))
-        
+        return self.client.recv(2048).decode(FORMAT)
 
 class client():
 
@@ -117,26 +116,14 @@ class client():
         print("USE AT YOUR OWN RISK CUZ SCORE DO BE WHACK")
         board = self.generate_random_board()
         correct_cnt = 0
-        check = True
-        list_of_cor = []
 
-        while(check):
-            list_of_cor.clear()
-            list_of_cor = self.network.get_search_board()
-            ur_cor = gomoku.search_max(board)
-            check = False
-            for cor in list_of_cor:
-                if(ur_cor[0] == cor[0] and ur_cor[1] == cor[1]):
-                    correct_cnt += 1
-                    check = True
-                    break
-            if(check):
-                print("Your answer: ", str(gomoku.search_max(board)))
-                print("LIST OF CORRECT CORS: ", list_of_cor)
-                correct_cnt += 1
-                print(f"Number of correct matches: {correct_cnt}")
-                time.sleep(DELAY)
-                board = self.generate_random_board()
+        while(str(gomoku.search_max(board)) == self.network.get_search(board)):
+            print(str(gomoku.search_max(board)))
+            print(self.network.get_search(board))
+            correct_cnt += 1
+            print(f"Number of correct matches: {correct_cnt}")
+            time.sleep(DELAY)
+            board = self.generate_random_board()
 
         print("WE HAVE FOUND AN ERROR ^_^")
         print("Here's the board:")
@@ -144,8 +131,8 @@ class client():
         print("YOUR PROGRAM CLAIMS: ")
         print(str(gomoku.search_max(board)))
         print('-------------------------------')
-        print("MRMANDARINS'S PROGRAM CLAIMS THESE ARE POSSIBLE MOVES:")
-        print(list_of_cor)
+        print("MRMANDARINS'S PROGRAM CLAIMS:")
+        print(self.network.get_search(board))
         print('\n')
 
     def compare_win(self):
