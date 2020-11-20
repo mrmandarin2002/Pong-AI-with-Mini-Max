@@ -2,9 +2,6 @@ import socket, threading, time
 from urllib import request
 import pygame, inspect, math
 
-#make sure to remove before submitting
-#import xlsxwriter
-
 HEADER = 16
 PORT = 5050
 FORMAT = 'utf-8'
@@ -54,7 +51,6 @@ class Network:
             self.conn.send(str.encode(data))
         except socket.error as e:
             return str(e)
-
 
 kill = False
 scratch = False
@@ -153,32 +149,80 @@ class game_ai():
         self.enemy_calculated = False
         self.calculating = False
         self.ball_info = [0,0,0,0]
+        self.max_loop = 5000
 
     def wall_collision(self, pos_y):
         return (int(pos_y) < 0 or (int(pos_y) + ball_size[1] > table_size[1]))
 
+    def paddle_collision(self, pos_x):
+        if(pos_x < -10 or pos_x > 450):
+            return False
+        return not (int(pos_x) > 24 and int(pos_x) < table_size[0] - 25 - ball_size[0])
+
+    def skip_frame(self, pos_x, pos_y, vel_x, vel_y, move_factor):
+        #walls
+        dis_to_wall = 0
+        y_max = 0
+        x_max = 0
+        if(vel_y < 0):
+            #print("WE IN 1")
+            dis_to_wall = pos_y + 1
+            y_max = int((dis_to_wall / (-vel_y * move_factor)) + 0.9999)
+        else:
+            #print("WE IN 2")
+            dis_to_wall = abs(266 - pos_y)
+            y_max = int((dis_to_wall / (vel_y * move_factor)) + 0.9999)
+        if(vel_x < 0):
+            #print("WE IN 3")
+            dis_to_paddle = abs(pos_x - 25) 
+            x_max = int((dis_to_paddle) / (-vel_x * move_factor) + 0.9999)
+        else:
+            #print("WE IN 4")
+            dis_to_paddle = abs(pos_x - 400)
+            x_max = int((dis_to_paddle) / (vel_x * move_factor) + 0.9999)
+        #print("X_MAX: ", x_max, " Y_MAX: ", y_max)
+        return min(y_max, x_max)
+
     def get_ball_endpoint(self, pos_x, pos_y, vel_x, vel_y):
         #print("GETTING ENDPOINT")
+        cnt = 0
         inv_move_factor = int((vel_x**2+vel_y**2)**.5)
         move_factor = 1
         if(inv_move_factor > 0):
             move_factor = 1.0 / inv_move_factor
-        while(int(pos_x) > 24 and int(pos_x) < table_size[0] - 20 - ball_size[0] - 5):
-            if (int(pos_y) < 0 or (int(pos_y) + ball_size[1] > table_size[1])):
+        while(not self.paddle_collision(pos_x)):
+            cnt += 1
+            if(cnt > self.max_loop):
+                break
+            if (self.wall_collision(pos_y)):
                 c = 0 
                 while (self.wall_collision(pos_y)):  
+                    cnt += 1
                     pos_x += -0.1 * vel_x * move_factor
                     pos_y += -0.1 * vel_y * move_factor
                     #print(pos_x, pos_y)
                     c += 1 
+                    if(cnt > self.max_loop):
+                        break
                 vel_y = -vel_y
                 while c > 0 or self.wall_collision(pos_y):
+                    cnt += 1
                     pos_x += 0.1 * vel_x * move_factor
                     pos_y += 0.1 * vel_y * move_factor
                     c -= 1 
+                    if(cnt > self.max_loop):
+                        break
+
             else:
-                pos_x += vel_x * move_factor
-                pos_y += vel_y * move_factor
+                #print("TESTING FRAME SKIP")
+                #print(pos_x, pos_y, vel_x, vel_y)
+                frames_to_skip = self.skip_frame(pos_x, pos_y, vel_x, vel_y, move_factor)
+                pos_x += vel_x * move_factor * frames_to_skip
+                pos_y += vel_y * move_factor * frames_to_skip
+        if(cnt > self.max_loop):
+            print("FUCKING ENDPOINT PIECE OF FUCKING SHIT FUCKKKKKKKK")
+            print(pos_x, pos_y, vel_x, vel_y)
+        #time.sleep(500)
         #print("GOT ENDPOINT")
         return (pos_x, pos_y, vel_x, vel_y)
 
@@ -196,11 +240,16 @@ class game_ai():
 
     def get_paddle_collision(self, pos_x, pos_y, vel_x, vel_y, paddle_loc_y, move_factor, p_orientation):
         c = 0 
-        while (int(pos_x) < 25 or int(pos_x) > table_size[0] - 20 - ball_size[0] - 6 and not self.wall_collision(pos_y)): 
+        cnt = 0
+        while (self.paddle_collision(pos_x) and not self.wall_collision(pos_y)): 
+            cnt += 1
             #print(pos_x, pos_y)
             pos_x -= 0.1 * vel_x * move_factor
             pos_y -= 0.1 * vel_y * move_factor
             c += 1
+            if(cnt > self.max_loop):
+                break
+            
         theta = self.get_angle(paddle_loc_y, pos_y+.5*ball_size[1], p_orientation)
         #print(theta)
         v = [vel_x, vel_y]
@@ -217,11 +266,17 @@ class game_ai():
             v[0] = (2*facing-1) 
         vel_x = v[0]
         vel_y = v[1]
-        while c > 0 or (int(pos_x) < 25 or int(pos_x) > table_size[0] - 20 - ball_size[0] - 6 and not self.wall_collision(pos_y)):
+        while c > 0 or (self.paddle_collision(pos_x) and not self.wall_collision(pos_y)):
+            cnt += 1
             #print("YESDRJ", pos_x, pos_y)
             pos_x += 0.1 * vel_x * move_factor
             pos_y += 0.1 * vel_y * move_factor
             c -= 1
+            if(cnt > self.max_loop):
+                break
+        if(cnt > self.max_loop):
+            print("FUCKING PADDLE COLLISION PIECE OF FUCKING SHIT FUCKKKKKKKK")
+            print(pos_x, pos_y, vel_x, vel_y)
         return (pos_x, pos_y, vel_x, vel_y)
 
     def calc_hits(self, pos_x, pos_y, vel_x, vel_y, enemy):
@@ -232,7 +287,7 @@ class game_ai():
         move_factor = 1
         if(inv_move_factor > 0):
             move_factor = 1.0 / inv_move_factor
-        for y in range(4, paddle_size[1] - 4, 3):
+        for y in range(2, paddle_size[1] - 2, 1):
             #print("Y:", y)
             paddle_loc_y = pos_y - y
             if(paddle_loc_y >= 0 and paddle_loc_y <= table_size[1] - paddle_size[1]):
@@ -256,14 +311,14 @@ class game_ai():
         move_to_y = self.ball_info[1]
         ball_to_y = self.ball_info[1]
         
-        #print("BALL ENDPOINT!: ", self.ball_info)
+        print("BALL ENDPOINT!: ", self.ball_info)
         self.calc_hits(self.ball_info[0], self.ball_info[1], self.ball_info[2], self.ball_info[3], enemy = False)
         #print(aim_list)
         #print("CALC TIME:", time.time() - t0)
 
     def enemy_calc(self):
         self.ball_info = self.get_ball_endpoint(self.ball_pos[0], self.ball_pos[1], self.ball_vel[0], self.ball_vel[1])
-        #print("ENEMY_CALC:", self.ball_info)
+        print("BALL ENDPOINT! ENEMY!:", self.ball_info)
         self.calc_hits(self.ball_info[0], self.ball_info[1], self.ball_info[2], self.ball_info[3], enemy = True)
         #print("IN2")
 
@@ -277,6 +332,7 @@ class game_ai():
             return min(abs(upper_bound), abs(lower_bound))
             
     def update(self, ball_pos, enemy_pos):
+        #time.sleep(0.5)
         global ball_to_y, move_to_y, paddle_orientation, selected, towards_paddle, ball_x_vel, he_ded, ded_already
         #print("UPDATING POSITION")
         if(abs(self.prev_ball_pos[0] - ball_pos[0]) > 100):
@@ -302,84 +358,60 @@ class game_ai():
                 self.calculated = False
                 towards_paddle = False
         #when ball comes towards paddle
-        if(towards_paddle):
-            he_ded = False
-            ded_already = False
-            if(not self.calculated):
-                if(self.wait > 0): #wait a bit for velocity to fully update
-                    self.wait -= 1
-                else:
-                    self.wait = 3
-                if(self.wait == 0):
-                    self.wait = -1
-                    #print("Calculating!")
-                    #pos_list.clear()
-                    self.calculated = True
-                    self.enemy_calculated = False
-                    threading.Thread(target = self.calc).start()
-        else:
-            thiccc = -ball_size[0]
-            if(self.paddle_orientation * -1 == 1):
-                thiccc = -paddle_size[0]
-            dis_to_paddle = abs(ball_pos[0] - enemy_pos[0]) + thiccc
-            if(ball_x_vel != 0):
-                time_to_paddle = abs(dis_to_paddle / ball_x_vel)
-                dis_paddle_to_end = self.paddle_dis_to_ball(self.ball_info[1], enemy_pos[1])
-                if(time_to_paddle < dis_paddle_to_end):
-                    #print(dis_paddle_to_end)
-                    #print("HE DEAD")
-                    he_ded = True
-                else:
-                    he_ded = False
-                    ded_already = False
+        if(not self.paddle_collision(self.ball_pos[0])):
+            #print("IN")
+            if(towards_paddle):
+                he_ded = False
+                ded_already = False
+                if(not self.calculated):
+                    if(self.wait > 0): #wait a bit for velocity to fully update
+                        self.wait -= 1
+                        
+                    else:
+                        self.wait = 5
+                    if(self.wait == 0):
+                        self.wait = -1
+                        #print("Calculating!")
+                        #pos_list.clear()
+                        self.calculated = True
+                        self.enemy_calculated = False
+                        aim_list.clear()
+                        threading.Thread(target = self.calc).start()
             else:
-                print("THICCC X VEL = 0 ??? NANI DAFUQ")
-            if(not self.enemy_calculated):
-                if(self.wait > 0): #wait a bit for velocity to fully update
-                    self.wait -= 1
+                thiccc = -ball_size[0]
+                if(self.paddle_orientation * -1 == 1):
+                    thiccc = -paddle_size[0]
+                dis_to_paddle = abs(ball_pos[0] - enemy_pos[0]) + thiccc
+                if(ball_x_vel != 0):
+                    time_to_paddle = abs(dis_to_paddle / ball_x_vel)
+                    dis_paddle_to_end = self.paddle_dis_to_ball(self.ball_info[1], enemy_pos[1])
+                    if(time_to_paddle < dis_paddle_to_end - 3):
+                        #print(dis_paddle_to_end) 
+                        #print("HE DEAD")
+                        he_ded = True
+                    else:
+                        he_ded = False
+                        ded_already = False
                 else:
-                    self.wait = 3
-                if(self.wait == 0):
-                    #print("Enemy Calculating!")
-                    if(aim_list):
-                        pass
-                    self.enemy_calculated = True
-                    threading.Thread(target = self.enemy_calc).start()
-                    self.calculated = False
-
-    '''
-    def export_data(self):
-        self.export_cnt += 1
-        workbook = xlsxwriter.Workbook("data" + str(self.export_cnt) + ".xlsx")
-        worksheet = workbook.add_worksheet()
-        worksheet.write('A1', "Calculated X")
-        worksheet.write('B1', "Calculated Y")
-        worksheet.write('D1', "Actual X")
-        worksheet.write('E1', "Actual Y")
-        worksheet.write('G1', "Calculated Vel X")
-        worksheet.write('H1', "Calculated Vel Y")
-        worksheet.write('J1', "Actual Vel X")
-        worksheet.write('K1', "Actual Vel Y")
-
-
-        for cnt, data in enumerate(calculated_pos_list):
-            worksheet.write(cnt + 1, 0, str(data[0]))
-            worksheet.write(cnt + 1, 1, str(data[1]))
-            worksheet.write(cnt + 1, 6, str(data[2]))
-            worksheet.write(cnt + 1, 7, str(data[3]))
-
-        for cnt, data in enumerate(pos_list):
-            worksheet.write(cnt + 1, 3, str(data[0]))
-            worksheet.write(cnt + 1, 4, str(data[1]))
-            worksheet.write(cnt + 1, 9, str(data[2]))
-            worksheet.write(cnt + 1, 10, str(data[3]))
-    '''
-
+                    print("THICCC X VEL = 0 ??? NANI DAFUQ")
+                if(not self.enemy_calculated):
+                    if(self.wait > 0): #wait a bit for velocity to fully update
+                        self.wait -= 1
+                    else:
+                        self.wait = 5
+                    if(self.wait == 0):
+                        #print("Enemy Calculating!")
+                        if(aim_list):
+                            pass
+                        self.enemy_calculated = True
+                        threading.Thread(target = self.enemy_calc).start()
+                        self.calculated = False
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     global ai, paddle_orientation, ai_running, move_to_y, ball_to_y, towards_paddle, paddle_speed, ball_x_vel, ded_already
     global client_thread, kill, old_opponent_code, old_render_code, scratch, kill_executed, scratch_executed
     global first_run, opponent_function, hax_thread, my_paddle
+
 
     if first_run:
         first_run = False
@@ -391,12 +423,18 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
                 old_opponent_code = opponent_function.__code__
 
     t0 = time.time()
+    '''
     if client_thread == None:
-        client_thread = game_client_thread()
-        client_thread.start()
+        try:
+            client_thread = game_client_thread()
+            client_thread.start()
+        except:
+            print("OOPS")
+            client_thread = "ERROR"
     else:
         pass
         #client_thread.network.send(str(ball_frect.pos[0]) + ':' + str(ball_frect.pos[1]))
+    '''
 
     if(paddle_frect.pos[0] < other_paddle_frect.pos[0]):
         paddle_orientation = 1
@@ -411,7 +449,6 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
 
     max_val = 0
     enemy_pos = (other_paddle_frect.pos[1], other_paddle_frect.pos[1] + paddle_size[1])
-
     '''
     for x in aim_list:
         print(int(x[0]), int(x[1]), int(x[2]))
@@ -433,8 +470,9 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
             #print("Time to paddle:", time_to_paddle)
             for idx, aim in enumerate(aim_list):
                 dis = min(abs((aim[0] + ball_size[1]) - enemy_pos[0]), abs(aim[0] - enemy_pos[1]))
-                if(abs(dis) > max_val and (time_to_paddle >= abs(aim[1] - paddle_frect.pos[1]) / paddle_speed)):
-                    max_val = dis
+                #if(abs(dis) * abs(aim[2]) > max_val and (time_to_paddle >= abs(aim[1] - paddle_frect.pos[1]) / paddle_speed)):
+                if(abs(dis) > max_val):
+                    max_val = abs(dis)
                     move_to_y = aim[1]
                     selected_idx = idx
             #print(aim_list[selected_idx])
@@ -454,10 +492,14 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
         move_to_y = 105
     #print(move_to_y)
 
+    #print("WE IN")
+
+    '''
     if god_mode:
         my_paddle.speed = 50
     else:
         my_paddle.speed = 1
+    '''
 
     if paddle_frect.pos[1] < move_to_y:
         #print(paddle_frect.pos)

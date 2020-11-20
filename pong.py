@@ -76,8 +76,8 @@ class Paddle:
         self.speed = factor*self.speed
 
     def move(self, enemy_frect, ball_frect, table_size):
-        direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
-        #direction = timeout(self.move_getter, (self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size)), {}, self.timeout)
+        #direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
+        direction = timeout(self.move_getter, (self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size)), {}, self.timeout)
         if direction == "up":
             self.frect.move_ip(0, -self.speed)
         elif direction == "down":
@@ -134,7 +134,6 @@ class Ball:
         self.speed = (factor*self.speed[0], factor*self.speed[1])
 
 
-
     def move(self, paddles, table_size, move_factor):
         moved = 0
         walls_Rects = [Rect((-100, -100), (table_size[0]+200, 100)),
@@ -159,15 +158,16 @@ class Ball:
 
         for paddle in paddles:
             if self.frect.intersect(paddle.frect):
+                print("Paddle collision")
+                print("BALL POSITION:", self.frect.pos)
+                print("PADDLE POSITION:", paddle.frect.pos)
                 if (paddle.facing == 1 and self.get_center()[0] < paddle.frect.pos[0] + paddle.frect.size[0]/2) or \
                 (paddle.facing == 0 and self.get_center()[0] > paddle.frect.pos[0] + paddle.frect.size[0]/2):
                     continue
-                
                 c = 0
                 
                 while self.frect.intersect(paddle.frect) and not self.frect.get_rect().colliderect(walls_Rects[0]) and not self.frect.get_rect().colliderect(walls_Rects[1]):
                     self.frect.move_ip(-.1*self.speed[0], -.1*self.speed[1], move_factor)
-                    
                     c += 1
                 theta = paddle.get_angle(self.frect.pos[1]+.5*self.frect.size[1])
                 
