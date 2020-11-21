@@ -323,7 +323,7 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect):
     enemy_pos = (other_paddle_frect[1], other_paddle_frect[1] + paddle_size[1])
     if(towards_paddle):
         if(len(aim_list) > 0):
-            thiccc = -ball_frect.size[0]
+            thiccc = -ball_size[0]
             if(paddle_orientation == 1):
                 thiccc = -paddle_size[0]
             dis_to_paddle = abs(ball_frect[0] - paddle_frect[0]) + thiccc

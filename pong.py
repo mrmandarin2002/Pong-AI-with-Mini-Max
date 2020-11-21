@@ -85,7 +85,7 @@ class Network:
             data = json.dumps(paddle_frect.pos + other_paddle_frect.pos + ball_frect.pos)
             print("SENT DATA:", data)
             self.client.send(str.encode(data))
-            returned_data = self.client.recv(data).DECODE(FORMAT)
+            returned_data = self.client.recv(2048).decode(FORMAT)
             print("RETURNED DATA", returned_data)
             return returned_data
         except socket.error as e:
@@ -394,9 +394,9 @@ def init_game():
     dust_error = 0.00
     init_speed_mag = 2
     timeout = 0.0003
-    clock_rate = 240
+    clock_rate = 60
     turn_wait_rate = 3
-    score_to_win = 500000
+    score_to_win = 10
 
 
     screen = pygame.display.set_mode(table_size)

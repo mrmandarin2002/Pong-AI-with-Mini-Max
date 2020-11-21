@@ -405,7 +405,7 @@ class game_ai():
                         if(aim_list):
                             pass
                         self.enemy_calculated = True
-                        print("AIMED AT: ", aim_list[selected_idx])
+                        #print("AIMED AT: ", aim_list[selected_idx])
                         threading.Thread(target = self.enemy_calc).start()
                         self.calculated = False
 
