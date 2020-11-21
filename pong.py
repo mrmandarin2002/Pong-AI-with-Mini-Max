@@ -19,7 +19,7 @@
 
 
 
-import pygame, sys, time, random, os, json, socket
+import pygame, sys, time, random, os, json, socket, threading
 from pygame.locals import *
 
 import math
@@ -32,6 +32,9 @@ HOST_IP = '172.105.7.203'
 white = [255, 255, 255]
 black = [0, 0, 0]
 clock = pygame.time.Clock()
+
+current_direction = "up"
+calc_done = True
 
 class fRect:
     '''
@@ -81,30 +84,41 @@ class Network:
         return received_message
 
     def make_move(self, paddle_frect, other_paddle_frect, ball_frect, table_size):
+        global current_direction, calc_done
         try:
             data = json.dumps(paddle_frect.pos + other_paddle_frect.pos + ball_frect.pos)
             #print("SENT DATA:", data)
             self.client.send(str.encode(data))
-            returned_data = self.client.recv(2048).decode(FORMAT)
-            #print("RETURNED DATA", returned_data)
-            return returned_data
+            current_direction = self.client.recv(2048).decode(FORMAT)
+            calc_done = True
+            
         except socket.error as e:
             return str(e)
 
 class Paddle:
-    def __init__(self, pos, size, speed, max_angle,  facing, timeout):
+    def __init__(self, pos, size, speed, max_angle,  facing, timeout, mrmandarin = False):
         self.frect = fRect((pos[0]-size[0]/2, pos[1]-size[1]/2), size)
         self.speed = speed
         self.size = size
         self.facing = facing
         self.max_angle = max_angle
         self.timeout = timeout
+        self.mrmandarin = mrmandarin
 
     def factor_accelerate(self, factor):
         self.speed = factor*self.speed
 
     def move(self, enemy_frect, ball_frect, table_size):
-        direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
+        global current_direction, calc_done
+        direction = None
+        if(self.mrmandarin):
+            if(calc_done):
+                calc_done = False
+                threading.Thread(target = self.move_getter, args = (self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))).start()
+            else:
+                direction = current_direction
+        else:
+            direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
         if direction == "up":
             self.frect.move_ip(0, -self.speed)
         elif direction == "down":
@@ -403,7 +417,7 @@ def init_game():
     pygame.display.set_caption('PongAIvAI')
 
     paddles = [Paddle((20, table_size[1]/2), paddle_size, paddle_speed, max_angle,  1, timeout),
-               Paddle((table_size[0]-20, table_size[1]/2), paddle_size, paddle_speed, max_angle, 0, timeout)]
+               Paddle((table_size[0]-20, table_size[1]/2), paddle_size, paddle_speed, max_angle, 0, timeout, mrmandarin = True)]
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
     

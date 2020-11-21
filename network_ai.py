@@ -181,7 +181,7 @@ class game_ai():
         move_factor = 1
         if(inv_move_factor > 0):
             move_factor = 1.0 / inv_move_factor
-        for y in range(2, paddle_size[1] - 2, 1):
+        for y in range(20, paddle_size[1] - 20, 1):
             #print("Y:", y)
             paddle_loc_y = pos_y - y
             if(paddle_loc_y >= 0 and paddle_loc_y <= table_size[1] - paddle_size[1]):
