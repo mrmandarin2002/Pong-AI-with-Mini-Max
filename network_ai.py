@@ -362,13 +362,6 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect):
         move_to_y = 105
 
     if paddle_frect[1] < move_to_y:
-        #print(paddle_frect)
-        if(time.time() - t0 > 0):
-            pass
-            #print("CHASER AI RUNTIME:", time.time() - t0)
         return "down"
     else:
-        if(time.time() - t0 > 0):
-            pass
-            #print("CHASER AI RUNTIME:", time.time() - t0)
         return "up"
