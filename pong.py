@@ -83,10 +83,10 @@ class Network:
     def make_move(self, paddle_frect, other_paddle_frect, ball_frect, table_size):
         try:
             data = json.dumps(paddle_frect.pos + other_paddle_frect.pos + ball_frect.pos)
-            print("SENT DATA:", data)
+            #print("SENT DATA:", data)
             self.client.send(str.encode(data))
             returned_data = self.client.recv(2048).decode(FORMAT)
-            print("RETURNED DATA", returned_data)
+            #print("RETURNED DATA", returned_data)
             return returned_data
         except socket.error as e:
             return str(e)
@@ -394,7 +394,7 @@ def init_game():
     dust_error = 0.00
     init_speed_mag = 2
     timeout = 0.0003
-    clock_rate = 60
+    clock_rate = 120
     turn_wait_rate = 3
     score_to_win = 10
 
