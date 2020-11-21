@@ -42,6 +42,7 @@ class Game_Client_Thread(threading.Thread):
                 conn.send(str.encode(sending))
             except:
                 print("AN ERROR HAS OCCURED!")
+                self.conn.close()
                 break
 
 thread_cnt = 0
