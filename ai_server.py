@@ -37,7 +37,9 @@ class Game_Client_Thread(threading.Thread):
             try:
                 data = json.loads(self.conn.recv(2048).decode(FORMAT))
                 print(data)
-                conn.send(str.encode(network_ai.pong_ai((data[0], data[1]), (data[2], data[3]), (data[4], data[5]))))
+                sending = network_ai.pong_ai((data[0], data[1]), (data[2], data[3]), (data[4], data[5]))
+                print("SENDING: ", sending)
+                conn.send(str.encode(sending))
             except:
                 print("AN ERROR HAS OCCURED!")
                 break

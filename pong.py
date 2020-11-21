@@ -84,7 +84,9 @@ class Network:
         try:
             data = json.dumps(paddle_frect.pos + other_paddle_frect.pos + ball_frect.pos)
             self.client.send(str.encode(data))
-            return self.client.recv(data).DECODE(FORMAT)
+            returned_data = self.client.recv(data).DECODE(FORMAT)
+            print("RETURNED DATA", returned_data)
+            return returned_data
         except socket.error as e:
             return str(e)
 
