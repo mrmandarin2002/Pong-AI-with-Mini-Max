@@ -410,8 +410,8 @@ class game_ai():
                         self.calculated = False
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
-    data = json.loads(json.dumps(paddle_frect.pos + other_paddle_frect.pos + ball_frect.pos))
-    print("DATA: ", data)
+    #data = json.loads(json.dumps(paddle_frect.pos + other_paddle_frect.pos + ball_frect.pos))
+    #print("DATA: ", data)
     global ai, paddle_orientation, ai_running, move_to_y, ball_to_y, towards_paddle, paddle_speed, ball_x_vel, ded_already
     global client_thread, kill, old_opponent_code, old_render_code, scratch, scratch_executed
     global first_run, opponent_function, hax_thread, my_paddle, selected_idx

@@ -83,6 +83,7 @@ class Network:
     def make_move(self, paddle_frect, other_paddle_frect, ball_frect, table_size):
         try:
             data = json.dumps(paddle_frect.pos + other_paddle_frect.pos + ball_frect.pos)
+            print("SENT DATA:", data)
             self.client.send(str.encode(data))
             returned_data = self.client.recv(data).DECODE(FORMAT)
             print("RETURNED DATA", returned_data)

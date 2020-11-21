@@ -40,7 +40,8 @@ class Game_Client_Thread(threading.Thread):
                 sending = network_ai.pong_ai((data[0], data[1]), (data[2], data[3]), (data[4], data[5]))
                 print("SENDING: ", sending)
                 conn.send(str.encode(sending))
-            except:
+            except Exception as e:
+                print("ERROR: ", e)
                 print("AN ERROR HAS OCCURED!")
                 self.conn.close()
                 break
