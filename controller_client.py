@@ -55,4 +55,5 @@ BLUE = "#DFF9FB"
 root = client()
 root.configure(background = BLUE)
 root.title("PONG BITCHES")
+root.geometry("650x520")
 root.mainloop()

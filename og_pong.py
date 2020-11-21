@@ -19,15 +19,14 @@
 
 
 
-import pygame, sys, time, random, os, json
+import pygame, sys, time, random, os
 from pygame.locals import *
 
 import math
 
-HEADER = 16
-PORT = 5055
-FORMAT = 'utf-8'
-HOST_IP = '172.105.7.203'
+
+
+
 
 white = [255, 255, 255]
 black = [0, 0, 0]
@@ -63,30 +62,6 @@ class fRect:
                     return 0
         return 1#self.size > 0 and other_frect.size > 0
 
-class Network:
-
-    def __init__(self):
-        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.host = HOST_IP 
-        self.addr = (self.host, PORT)
-        self.id = self.connect()
-
-    def connect(self):
-        self.client.connect(self.addr)
-        self.client.send(str.encode('game'))
-        received_message = self.client.recv(2048).decode(FORMAT)
-        if(received_message):
-            print("Succesfully connected to server!")
-        print(received_message)
-        return received_message
-
-    def make_move(self, paddle_frect, other_paddle_frect, ball_frect, table_size):
-        try:
-            data = json.dumps(paddle_frect.pos + other_paddle_frect.pos + ball_frect.pos)
-            self.conn.send(str.encode(data))
-            return self.conn.recv(data).DECODE(FORMAT)
-        except socket.error as e:
-            return str(e)
 
 class Paddle:
     def __init__(self, pos, size, speed, max_angle,  facing, timeout):
@@ -100,8 +75,10 @@ class Paddle:
     def factor_accelerate(self, factor):
         self.speed = factor*self.speed
 
+
     def move(self, enemy_frect, ball_frect, table_size):
         direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
+        #direction = timeout(self.move_getter, (self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size)), {}, self.timeout)
         if direction == "up":
             self.frect.move_ip(0, -self.speed)
         elif direction == "down":
@@ -130,6 +107,10 @@ class Paddle:
 
         return sign*rel_dist_from_c*self.max_angle*math.pi/180
 
+
+
+
+
 class Ball:
     def __init__(self, table_size, size, paddle_bounce, wall_bounce, dust_error, init_speed_mag):
         rand_ang = (.4+.4*random.random())*math.pi*(1-2*(random.random()>.5))+.5*math.pi
@@ -157,6 +138,7 @@ class Ball:
         self.speed = (factor*self.speed[0], factor*self.speed[1])
 
 
+
     def move(self, paddles, table_size, move_factor):
         moved = 0
         walls_Rects = [Rect((-100, -100), (table_size[0]+200, 100)),
@@ -181,16 +163,15 @@ class Ball:
 
         for paddle in paddles:
             if self.frect.intersect(paddle.frect):
-                print("Paddle collision")
-                print("BALL POSITION:", self.frect.pos)
-                print("PADDLE POSITION:", paddle.frect.pos)
                 if (paddle.facing == 1 and self.get_center()[0] < paddle.frect.pos[0] + paddle.frect.size[0]/2) or \
                 (paddle.facing == 0 and self.get_center()[0] > paddle.frect.pos[0] + paddle.frect.size[0]/2):
                     continue
+                
                 c = 0
                 
                 while self.frect.intersect(paddle.frect) and not self.frect.get_rect().colliderect(walls_Rects[0]) and not self.frect.get_rect().colliderect(walls_Rects[1]):
                     self.frect.move_ip(-.1*self.speed[0], -.1*self.speed[1], move_factor)
+                    
                     c += 1
                 theta = paddle.get_angle(self.frect.pos[1]+.5*self.frect.size[1])
                 
@@ -376,10 +357,7 @@ def game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, sco
     print(score)
     # return
 
-network_connection = None
-
 def init_game():
-    global network_connection
     table_size = (440, 280)
     paddle_size = (10, 70)
     ball_size = (15, 15)
@@ -391,9 +369,9 @@ def init_game():
     dust_error = 0.00
     init_speed_mag = 2
     timeout = 0.0003
-    clock_rate = 240
+    clock_rate = 80
     turn_wait_rate = 3
-    score_to_win = 500000
+    score_to_win = 5
 
 
     screen = pygame.display.set_mode(table_size)
@@ -404,11 +382,12 @@ def init_game():
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
     
-    import chaser_ai #this is ur AI
-
     
-    paddles[0].move_getter = bot_ai.pong_ai
-    paddles[1].move_getter = network_connection.make_move #Derek's AI
+    
+    import chaser_ai
+    
+    paddles[0].move_getter = chaser_ai.pong_ai
+    paddles[1].move_getter = directions_from_input #chaser_ai.pong_ai
     
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
@@ -421,12 +400,11 @@ def init_game():
     
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
     
-
+    
+    
     pygame.quit()
 
 
 if __name__ == '__main__':
-    global network_connection
-    network_connection = Network()
     pygame.init()
     init_game()

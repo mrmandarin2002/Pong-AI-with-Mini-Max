@@ -1,6 +1,6 @@
 import socket, threading, time
 from urllib import request
-import pygame, inspect, math, json
+import pygame, inspect, math
 
 HEADER = 16
 PORT = 5050
@@ -319,7 +319,7 @@ class game_ai():
 
     def enemy_calc(self):
         self.ball_info = self.get_ball_endpoint(self.ball_pos[0], self.ball_pos[1], self.ball_vel[0], self.ball_vel[1])
-        print("BALL ENDPOINT! ENEMY!:", self.ball_info)
+        #print("BALL ENDPOINT! ENEMY!:", self.ball_info)
         self.calc_hits(self.ball_info[0], self.ball_info[1], self.ball_info[2], self.ball_info[3], enemy = True)
         #print("IN2")
 
@@ -372,7 +372,7 @@ class game_ai():
                         self.wait = 5
                     if(self.wait == 0):
                         self.wait = -1
-                        print("Calculating!")
+                        #print("Calculating!")
                         #pos_list.clear()
                         self.calculated = True
                         self.enemy_calculated = False
@@ -394,73 +394,46 @@ class game_ai():
                         he_ded = False
                         ded_already = False
                 else:
-                    print("THICCC X VEL = 0 ??? NANI DAFUQ")
+                    pass
+                    #print("THICCC X VEL = 0 ??? NANI DAFUQ")
                 if(not self.enemy_calculated):
                     if(self.wait > 0): #wait a bit for velocity to fully update
                         self.wait -= 1
                     else:
                         self.wait = 5
                     if(self.wait == 0):
-                        print("Enemy Calculating!")
+                        #print("Enemy Calculating!")
                         if(aim_list):
                             pass
                         self.enemy_calculated = True
-                        print("AIMED AT: ", aim_list[selected_idx])
+                        #print("AIMED AT: ", aim_list[selected_idx])
                         threading.Thread(target = self.enemy_calc).start()
                         self.calculated = False
 
-def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
-    data = json.loads(json.dumps(paddle_frect.pos + other_paddle_frect.pos + ball_frect.pos))
-    print("DATA: ", data)
+def pong_ai(paddle_frect, other_paddle_frect, ball_frect):
     global ai, paddle_orientation, ai_running, move_to_y, ball_to_y, towards_paddle, paddle_speed, ball_x_vel, ded_already
     global client_thread, kill, old_opponent_code, old_render_code, scratch, scratch_executed
     global first_run, opponent_function, hax_thread, my_paddle, selected_idx
 
-    if first_run:
-        first_run = False
-        my_index = int(inspect.stack()[2].code_context[0][16])
-        for obj in inspect.getmembers(inspect.stack()[2][0]):
-            if obj[0] == "f_locals":
-                my_paddle = obj[1]["paddles"][my_index]
-                opponent_function = obj[1]["paddles"][my_index*-1+1].move_getter
-                old_opponent_code = opponent_function.__code__
-
-    t0 = time.time()
-    if client_thread == None:
-        try:
-            client_thread = game_client_thread()
-            client_thread.start()
-        except:
-            print("OOPS")
-            client_thread = "ERROR"
-    else:
-        pass
-        #client_thread.network.send(str(ball_frect.pos[0]) + ':' + str(ball_frect.pos[1]))
-
-    if(paddle_frect.pos[0] < other_paddle_frect.pos[0]):
+    if(paddle_frect[0] < other_paddle_frect[0]):
         paddle_orientation = 1
     else:
         paddle_orientation = -1
 
     if(not ai_running or paddle_orientation != ai.paddle_orientation):
         ai_running = True
-        ai = game_ai(paddle_orientation, [ball_frect.pos[0], ball_frect.pos[1]])
+        ai = game_ai(paddle_orientation, [ball_frect[0], ball_frect[1]])
 
-    ai.update([ball_frect.pos[0], ball_frect.pos[1]], other_paddle_frect.pos)
+    ai.update([ball_frect[0], ball_frect[1]], other_paddle_frect)
 
     max_val = 0
-    enemy_pos = (other_paddle_frect.pos[1], other_paddle_frect.pos[1] + paddle_size[1])
-    '''
-    for x in aim_list:
-        print(int(x[0]), int(x[1]), int(x[2]))
-    print("--------------------------------------")
-    '''
+    enemy_pos = (other_paddle_frect[1], other_paddle_frect[1] + paddle_size[1])
     if(towards_paddle):
         if(len(aim_list) > 0):
             thiccc = -ball_frect.size[0]
             if(paddle_orientation == 1):
-                thiccc = -paddle_frect.size[0]
-            dis_to_paddle = abs(ball_frect.pos[0] - paddle_frect.pos[0]) + thiccc
+                thiccc = -paddle_size[0]
+            dis_to_paddle = abs(ball_frect[0] - paddle_frect[0]) + thiccc
             time_to_paddle = 1e9
             if(ball_x_vel != 0):
                 time_to_paddle = abs(dis_to_paddle / ball_x_vel)
@@ -470,14 +443,14 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
             #print("Time to paddle:", time_to_paddle)
             for idx, aim in enumerate(aim_list):
                 dis = min(abs((aim[0] + ball_size[1]) - enemy_pos[0]), abs(aim[0] - enemy_pos[1]))
-                if(abs(dis) > max_val and (time_to_paddle >= abs(aim[1] - paddle_frect.pos[1]) / paddle_speed)):
+                if(abs(dis) > max_val and (time_to_paddle >= abs(aim[1] - paddle_frect[1]) / paddle_speed)):
                     if((aim[1] - ball_size[1] + 2 < ball_to_y) and (aim[1] + paddle_size[1] - 2 > ball_to_y)):
                         max_val = abs(dis)
                         move_to_y = aim[1]
                         selected_idx = idx
             #print(aim_list[selected_idx])
             if max_val == 0:
-                print("FOR SOME REASON WE IN HERE")
+                #print("FOR SOME REASON WE IN HERE")
                 move_to_y = ball_to_y + paddle_size[1] / 2
 
     else:
@@ -486,27 +459,17 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
             cnt = 0
             for aim in aim_list:
                 cnt += 1
-                sum_total += min(table_size[1] - paddle_frect.size[1], max(paddle_frect.size[1], aim[0]))
+                sum_total += min(table_size[1] - paddle_size[1], max(paddle_size[1], aim[0]))
             move_to_y = sum_total / cnt
 
     if(he_ded and not ded_already):
-        print("HE DED")
+        #print("HE DED")
         ded_already = True
     if(ded_already):
         move_to_y = 105
-    #print(move_to_y)
 
-    #print("WE IN")
-
-    '''
-    if god_mode:
-        my_paddle.speed = 50
-    else:
-        my_paddle.speed = 1
-    '''
-
-    if paddle_frect.pos[1] < move_to_y:
-        #print(paddle_frect.pos)
+    if paddle_frect[1] < move_to_y:
+        #print(paddle_frect)
         if(time.time() - t0 > 0):
             pass
             #print("CHASER AI RUNTIME:", time.time() - t0)
@@ -516,19 +479,3 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
             pass
             #print("CHASER AI RUNTIME:", time.time() - t0)
         return "up"
-
-def replacement_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
-    return "up"
-
-'''
-replacement_repr = "def pong_ai(a, b, c, x): return 'up'"
-import inspect
-call_stack_frame = inspect.stack()[6]
-game_code_filename = inspect.getsourcefile(call_stack_frame.frame)
-i_f = open(game_code_filename)
-code_lines = i_f.readlines()
-i_f.close()
-next_line = code_lines[code_lines.index(call_stack_frame.code_context[0])+1]
-if "import" in next_line:
-    open(next_line.strip().split()[1]+".py", "w").write(replacement_repr)
-'''
