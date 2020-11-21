@@ -262,7 +262,7 @@ class game_ai():
                         self.wait -= 1
                         
                     else:
-                        self.wait = 5
+                        self.wait = 1
                     if(self.wait == 0):
                         self.wait = -1
                         #print("Calculating!")
@@ -293,7 +293,7 @@ class game_ai():
                     if(self.wait > 0): #wait a bit for velocity to fully update
                         self.wait -= 1
                     else:
-                        self.wait = 5
+                        self.wait = 1
                     if(self.wait == 0):
                         #print("Enemy Calculating!")
                         if(aim_list):
