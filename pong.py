@@ -19,7 +19,7 @@
 
 
 
-import pygame, sys, time, random, os, json
+import pygame, sys, time, random, os, json, socket
 from pygame.locals import *
 
 import math
@@ -83,8 +83,8 @@ class Network:
     def make_move(self, paddle_frect, other_paddle_frect, ball_frect, table_size):
         try:
             data = json.dumps(paddle_frect.pos + other_paddle_frect.pos + ball_frect.pos)
-            self.conn.send(str.encode(data))
-            return self.conn.recv(data).DECODE(FORMAT)
+            self.client.send(str.encode(data))
+            return self.client.recv(data).DECODE(FORMAT)
         except socket.error as e:
             return str(e)
 
@@ -405,9 +405,8 @@ def init_game():
 
     
     import chaser_ai #this is ur AI
-
     
-    paddles[0].move_getter = bot_ai.pong_ai
+    paddles[0].move_getter = chaser_ai.pong_ai
     paddles[1].move_getter = network_connection.make_move #Derek's AI
     
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
@@ -426,7 +425,7 @@ def init_game():
 
 
 if __name__ == '__main__':
-    global network_connection
+    network_connection
     network_connection = Network()
     pygame.init()
     init_game()

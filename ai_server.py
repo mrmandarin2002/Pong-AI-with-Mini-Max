@@ -42,6 +42,8 @@ class Game_Client_Thread(threading.Thread):
                 print("AN ERROR HAS OCCURED!")
                 break
 
+thread_cnt = 0
+
 while True:
     conn, addr = s.accept()
     print(f"Connection with {addr} established!")
@@ -51,4 +53,5 @@ while True:
         print("Connection with game client established!")
         game_clients.append(Game_Client_Thread(thread_cnt, addr, conn))
         game_clients[len(game_clients) - 1].start()
+        thread_cnt += 1
 
