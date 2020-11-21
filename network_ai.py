@@ -2,11 +2,6 @@ import socket, threading, time
 from urllib import request
 import pygame, inspect, math
 
-HEADER = 16
-PORT = 5050
-FORMAT = 'utf-8'
-HOST_IP = '172.105.7.203'
-
 thread_running = False
 client_thread = None
 
@@ -24,33 +19,6 @@ def replacement_render(screen, paddles, ball, score, table_size):
     height = int(ball.frect.size[0]*1.503472222)
     screen.blit(pygame.transform.scale(scratch_img, (width, height)), (int(ball.get_center()[0]-width/2), int(ball.get_center()[1]-height/2)))
     pygame.display.flip()
-
-class Network:
-
-    def __init__(self):
-        self.conn = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.host = HOST_IP 
-        self.addr = (self.host, PORT)
-        self.id = self.connect()
-
-    def connect(self):
-        self.conn.connect(self.addr)
-        self.conn.send(str.encode('game'))
-        received_message = self.conn.recv(2048).decode()
-        if(received_message):
-            print("Succesfully connected to server!")
-        print(received_message)
-        return received_message
-
-    def send(self, data):
-        """
-        :param data: str
-        :return: str
-        """
-        try:
-            self.conn.send(str.encode(data))
-        except socket.error as e:
-            return str(e)
 
 kill = False
 scratch = False
