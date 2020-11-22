@@ -54,7 +54,8 @@ waiting_list = []
 
 while True:
     conn, addr = s.accept()
-    print(f"Connection with {addr} established!")
+    if(addr not in waiting_list):
+        print(f"Connection with {addr} established!")
     client_type = conn.recv(2048).decode(FORMAT)
     if(client_type == 'game' and not currently_playing):
         print("Connection with game client established!")
@@ -71,6 +72,6 @@ while True:
             print(waiting_list)
     elif(currently_playing):
         if(addr not in waiting_list):
-            waiting_list.append(waiting_list)
+            waiting_list.append(addr)
         conn.send(str.encode("busy"))
 

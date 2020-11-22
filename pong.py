@@ -70,13 +70,13 @@ class fRect:
 class Network:
 
     def __init__(self):
+        self.total_wait_time = 0
+        self.id = self.connect()
+
+    def connect(self):
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.host = HOST_IP 
         self.addr = (self.host, PORT)
-        self.id = self.connect()
-        self.total_wait_time = 0
-
-    def connect(self):
         self.client.connect(self.addr)
         self.client.send(str.encode('game'))
         received_message = self.client.recv(2048).decode(FORMAT)
@@ -92,6 +92,7 @@ class Network:
                 print("Tell whoever is hogging the server to bugger off")
             elif(self.total_wait_time == 10000):
                 print("Aight time to fucking ping me so I can purge that stupid shit")
+            self.client.close()
             time.sleep(1)
             self.connect()
         else:
@@ -326,9 +327,12 @@ def timeout(func, args=(), kwargs={}, timeout_duration=1, default=None):
 
 def render(screen, paddles, ball, score, table_size):
     screen.fill(black)
-
-    pygame.draw.rect(screen, pink, paddles[0].frect.get_rect())
-    pygame.draw.rect(screen, white, paddles[1].frect.get_rect())
+    if(paddles[0].mrmandarin):
+        pygame.draw.rect(screen, pink, paddles[0].frect.get_rect())
+        pygame.draw.rect(screen, white, paddles[1].frect.get_rect())
+    else:
+        pygame.draw.rect(screen, white, paddles[0].frect.get_rect())
+        pygame.draw.rect(screen, pink, paddles[1].frect.get_rect())
 
     pygame.draw.circle(screen, white, (int(ball.get_center()[0]), int(ball.get_center()[1])),  int(ball.frect.size[0]/2), 0)
 
@@ -438,7 +442,7 @@ def init_game():
     timeout = 0.0003
     clock_rate = 90
     turn_wait_rate = 3
-    score_to_win = 5
+    score_to_win = 3
 
 
     screen = pygame.display.set_mode(table_size)
@@ -462,7 +466,8 @@ def init_game():
     clock.tick(4)
     
     paddles[0].move_getter, paddles[1].move_getter = paddles[1].move_getter, paddles[0].move_getter
-    
+    paddles[0].mrmandarin = False
+    paddles[1].mrmandarin = True
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
     
 
