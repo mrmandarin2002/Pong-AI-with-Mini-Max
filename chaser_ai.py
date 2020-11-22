@@ -124,8 +124,6 @@ ball_to_y = 140
 table_size = (440, 280)
 paddle_size = (10, 70)
 ball_size = (15, 15)
-calculated_pos_list = []
-pos_list = []
 aim_list = []
 selected = -1
 towards_paddle = False
@@ -347,7 +345,6 @@ class game_ai():
             self.enemy_calculated = False
         self.prev_ball_pos = self.ball_pos
         self.ball_pos = ball_pos
-        pos_list.append((self.ball_pos[0], self.ball_pos[1], self.ball_vel[0], self.ball_vel[1]))
         self.paddle_orientation = paddle_orientation
         self.prev_ball_vel = self.ball_vel
         self.ball_vel = [self.ball_pos[0] - self.prev_ball_pos[0], self.ball_pos[1] - self.prev_ball_pos[1]]
@@ -384,7 +381,6 @@ class game_ai():
                     if(self.wait == 0):
                         self.wait = -1
                         #print("Calculating!")
-                        #pos_list.clear()
                         self.calculated = True
                         self.enemy_calculated = False
                         threading.Thread(target = self.calc).start()

@@ -22,6 +22,7 @@ print("Waiting for a connection")
 
 controller_clients = []
 game_clients = []
+currently_playing = False
 
 class Game_Client_Thread(threading.Thread):
 
@@ -33,29 +34,43 @@ class Game_Client_Thread(threading.Thread):
         self.conn = conn
 
     def run(self):
+        global currently_playing
         while True:
             try:
                 data = json.loads(self.conn.recv(2048).decode(FORMAT))
-                #print(data)
                 sending = network_ai.pong_ai((data[0], data[1]), (data[2], data[3]), (data[4], data[5]))
-                #print("SENDING: ", sending)
-                conn.send(str.encode(sending))
+                self.conn.send(str.encode(sending))
             except Exception as e:
                 print("ERROR: ", e)
                 print("AN ERROR HAS OCCURED!")
                 self.conn.close()
+                currently_playing = False
                 break
 
 thread_cnt = 0
+
+addr_list = []
+waiting_list = []
 
 while True:
     conn, addr = s.accept()
     print(f"Connection with {addr} established!")
     client_type = conn.recv(2048).decode(FORMAT)
-    conn.send(str.encode(str(thread_cnt)))
-    if(client_type == 'game'):
+    if(client_type == 'game' and not currently_playing):
         print("Connection with game client established!")
+        conn.send(str.encode(str(thread_cnt)))
         game_clients.append(Game_Client_Thread(thread_cnt, addr, conn))
         game_clients[len(game_clients) - 1].start()
-        thread_cnt += 1
+        currently_playing = True
+        addr_list.append(addr)
+        if(addr in waiting_list):
+            waiting_list.remove(addr)
+        print(f"People in waiting list: {len(waiting_list)}")
+        if(len(waiting_list)):
+            print("Waiting list:")
+            print(waiting_list)
+    elif(currently_playing):
+        if(addr not in waiting_list):
+            waiting_list.append(waiting_list)
+        conn.send(str.encode("busy"))
 

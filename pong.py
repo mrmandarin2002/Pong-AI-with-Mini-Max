@@ -31,6 +31,7 @@ HOST_IP = '172.105.7.203'
 
 white = [255, 255, 255]
 black = [0, 0, 0]
+pink = [255,105,180]
 clock = pygame.time.Clock()
 
 current_direction = "up"
@@ -73,23 +74,52 @@ class Network:
         self.host = HOST_IP 
         self.addr = (self.host, PORT)
         self.id = self.connect()
+        self.total_wait_time = 0
 
     def connect(self):
         self.client.connect(self.addr)
         self.client.send(str.encode('game'))
         received_message = self.client.recv(2048).decode(FORMAT)
-        if(received_message):
+        if(received_message == "busy"):
+            self.total_wait_time += 1
+            print("Server is busy with another little shit.")
+            print(f"You've Been waiting for {self.total_wait_time} seconds")
+            if(self.total_wait_time == 60):
+                print("Well thank you for waiting")
+            elif(self.total_wait_time == 120):
+                print("...")
+            elif(self.total_wait_time == 1000):
+                print("Tell whoever is hogging the server to bugger off")
+            elif(self.total_wait_time == 10000):
+                print("Aight time to fucking ping me so I can purge that stupid shit")
+            time.sleep(1)
+            self.connect()
+        else:
             print("Succesfully connected to server!")
-        print(received_message)
+            print(received_message)
         return received_message
+
+    def disconnect(self):
+        self.client.close()
 
     def make_move(self, paddle_frect, other_paddle_frect, ball_frect, table_size):
         global current_direction, calc_done
         try:
             data = json.dumps(paddle_frect.pos + other_paddle_frect.pos + ball_frect.pos)
-            #print("SENT DATA:", data)
             self.client.send(str.encode(data))
             return self.client.recv(2048).decode(FORMAT)
+            
+        except socket.error as e:
+            return str(e)
+
+    def make_move_threading(self, paddle_frect, other_paddle_frect, ball_frect, table_size):
+        global current_direction, calc_done
+        try:
+            data = json.dumps(paddle_frect.pos + other_paddle_frect.pos + ball_frect.pos)
+            #print("SENT DATA:", data)
+            self.client.send(str.encode(data))
+            current_direction = self.client.recv(2048).decode(FORMAT)
+            calc_done = True
           
             
         except socket.error as e:
@@ -111,7 +141,6 @@ class Paddle:
     def move(self, enemy_frect, ball_frect, table_size):
         global current_direction, calc_done
         direction = None
-        '''
         if(self.mrmandarin):
             if(calc_done):
                 calc_done = False
@@ -120,8 +149,7 @@ class Paddle:
             else:
                 direction = current_direction
         else:
-        '''
-        direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
+            direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
         if direction == "up":
             self.frect.move_ip(0, -self.speed)
         elif direction == "down":
@@ -201,9 +229,6 @@ class Ball:
 
         for paddle in paddles:
             if self.frect.intersect(paddle.frect):
-                print("Paddle collision")
-                print("BALL POSITION:", self.frect.pos)
-                print("PADDLE POSITION:", paddle.frect.pos)
                 if (paddle.facing == 1 and self.get_center()[0] < paddle.frect.pos[0] + paddle.frect.size[0]/2) or \
                 (paddle.facing == 0 and self.get_center()[0] > paddle.frect.pos[0] + paddle.frect.size[0]/2):
                     continue
@@ -302,7 +327,7 @@ def timeout(func, args=(), kwargs={}, timeout_duration=1, default=None):
 def render(screen, paddles, ball, score, table_size):
     screen.fill(black)
 
-    pygame.draw.rect(screen, white, paddles[0].frect.get_rect())
+    pygame.draw.rect(screen, pink, paddles[0].frect.get_rect())
     pygame.draw.rect(screen, white, paddles[1].frect.get_rect())
 
     pygame.draw.circle(screen, white, (int(ball.get_center()[0]), int(ball.get_center()[1])),  int(ball.frect.size[0]/2), 0)
@@ -411,23 +436,23 @@ def init_game():
     dust_error = 0.00
     init_speed_mag = 2
     timeout = 0.0003
-    clock_rate = 60
+    clock_rate = 90
     turn_wait_rate = 3
-    score_to_win = 10
+    score_to_win = 5
 
 
     screen = pygame.display.set_mode(table_size)
     pygame.display.set_caption('PongAIvAI')
 
-    paddles = [Paddle((20, table_size[1]/2), paddle_size, paddle_speed, max_angle,  1, timeout),
-               Paddle((table_size[0]-20, table_size[1]/2), paddle_size, paddle_speed, max_angle, 0, timeout, mrmandarin = True)]
+    paddles = [Paddle((20, table_size[1]/2), paddle_size, paddle_speed, max_angle,  1, timeout, mrmandarin = True),
+               Paddle((table_size[0]-20, table_size[1]/2), paddle_size, paddle_speed, max_angle, 0, timeout)]
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
     
     import chaser_ai #this is ur AI
     
     paddles[1].move_getter = chaser_ai.pong_ai
-    paddles[0].move_getter = network_connection.make_move #Derek's AI
+    paddles[0].move_getter = network_connection.make_move_threading #Derek's AI
     
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
@@ -449,3 +474,4 @@ if __name__ == '__main__':
     network_connection = Network()
     pygame.init()
     init_game()
+    network_connection.disconnect();
