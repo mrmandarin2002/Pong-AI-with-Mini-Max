@@ -77,8 +77,8 @@ class Paddle:
 
 
     def move(self, enemy_frect, ball_frect, table_size):
-        direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
-        #direction = timeout(self.move_getter, (self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size)), {}, self.timeout)
+        #direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
+        direction = timeout(self.move_getter, (self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size)), {}, self.timeout)
         if direction == "up":
             self.frect.move_ip(0, -self.speed)
         elif direction == "down":
@@ -188,7 +188,7 @@ class Ball:
 
 
                 # Bona fide hack: enforce a lower bound on horizontal speed and disallow back reflection
-                if  v[0]*(2*paddle.facing-1) < 1: # ball is not traveling (a) away from paddle (b) at a sufficient speed
+                if  v[0]*(2*paddle.facing-1) < 1 and v[1] > 0: # ball is not traveling (a) away from paddle (b) at a sufficient speed
                     v[1] = (v[1]/abs(v[1]))*math.sqrt(v[0]**2 + v[1]**2 - 1) # transform y velocity so as to maintain the speed
                     v[0] = (2*paddle.facing-1) # note that minimal horiz speed will be lower than we're used to, where it was 0.95 prior to increase by *1.2
 
@@ -369,9 +369,9 @@ def init_game():
     dust_error = 0.00
     init_speed_mag = 2
     timeout = 0.0003
-    clock_rate = 80
+    clock_rate = 90
     turn_wait_rate = 3
-    score_to_win = 5
+    score_to_win = 50
 
 
     screen = pygame.display.set_mode(table_size)
@@ -381,13 +381,10 @@ def init_game():
                Paddle((table_size[0]-20, table_size[1]/2), paddle_size, paddle_speed, max_angle, 0, timeout)]
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
-    
-    
-    
-    import chaser_ai
+    import chaser_ai, ted_ai
     
     paddles[0].move_getter = chaser_ai.pong_ai
-    paddles[1].move_getter = directions_from_input #chaser_ai.pong_ai
+    paddles[1].move_getter = ted_ai.pong_ai #chaser_ai.pong_ai
     
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)

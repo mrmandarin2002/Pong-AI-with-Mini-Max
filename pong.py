@@ -89,8 +89,8 @@ class Network:
             data = json.dumps(paddle_frect.pos + other_paddle_frect.pos + ball_frect.pos)
             #print("SENT DATA:", data)
             self.client.send(str.encode(data))
-            current_direction = self.client.recv(2048).decode(FORMAT)
-            calc_done = True
+            return self.client.recv(2048).decode(FORMAT)
+          
             
         except socket.error as e:
             return str(e)
@@ -111,14 +111,17 @@ class Paddle:
     def move(self, enemy_frect, ball_frect, table_size):
         global current_direction, calc_done
         direction = None
+        '''
         if(self.mrmandarin):
             if(calc_done):
                 calc_done = False
                 threading.Thread(target = self.move_getter, args = (self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))).start()
+                direction = current_direction
             else:
                 direction = current_direction
         else:
-            direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
+        '''
+        direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
         if direction == "up":
             self.frect.move_ip(0, -self.speed)
         elif direction == "down":
@@ -423,8 +426,8 @@ def init_game():
     
     import chaser_ai #this is ur AI
     
-    paddles[0].move_getter = chaser_ai.pong_ai
-    paddles[1].move_getter = network_connection.make_move #Derek's AI
+    paddles[1].move_getter = chaser_ai.pong_ai
+    paddles[0].move_getter = network_connection.make_move #Derek's AI
     
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)

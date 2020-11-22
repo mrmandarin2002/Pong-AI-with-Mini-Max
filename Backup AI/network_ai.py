@@ -181,7 +181,7 @@ class game_ai():
         move_factor = 1
         if(inv_move_factor > 0):
             move_factor = 1.0 / inv_move_factor
-        for y in range(20, paddle_size[1] - 20, 1):
+        for y in range(10, paddle_size[1] - 10, 1):
             #print("Y:", y)
             paddle_loc_y = pos_y - y
             if(paddle_loc_y >= 0 and paddle_loc_y <= table_size[1] - paddle_size[1]):
@@ -262,7 +262,7 @@ class game_ai():
                         self.wait -= 1
                         
                     else:
-                        self.wait = 1
+                        self.wait = 5
                     if(self.wait == 0):
                         self.wait = -1
                         #print("Calculating!")
@@ -293,7 +293,7 @@ class game_ai():
                     if(self.wait > 0): #wait a bit for velocity to fully update
                         self.wait -= 1
                     else:
-                        self.wait = 1
+                        self.wait = 5
                     if(self.wait == 0):
                         #print("Enemy Calculating!")
                         if(aim_list):

@@ -1,6 +1,6 @@
 from datetime import datetime
 import socket, sys, threading, json
-import network_ai
+import chaser_ai
 
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
@@ -37,7 +37,7 @@ class Game_Client_Thread(threading.Thread):
             try:
                 data = json.loads(self.conn.recv(2048).decode(FORMAT))
                 #print(data)
-                sending = network_ai.pong_ai((data[0], data[1]), (data[2], data[3]), (data[4], data[5]))
+                sending = chaser_ai.pong_ai((data[0], data[1]), (data[2], data[3]), (data[4], data[5]))
                 #print("SENDING: ", sending)
                 conn.send(str.encode(sending))
             except Exception as e:
