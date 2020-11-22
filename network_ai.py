@@ -475,7 +475,7 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect):
         if(len(aim_list) > 0):
             thiccc = -ball_size[0]
             if(paddle_orientation == 1):
-                thiccc = -paddle_.size[0]
+                thiccc = -paddle_size[0]
             dis_to_paddle = abs(ball_frect[0] - paddle_frect[0]) + thiccc
             time_to_paddle = 1e9
             if(ball_x_vel != 0):
