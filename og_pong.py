@@ -137,7 +137,10 @@ class Ball:
     def factor_accelerate(self, factor):
         self.speed = (factor*self.speed[0], factor*self.speed[1])
 
-
+    def paddle_collision(self, pos_x):
+        if(pos_x < -10 or pos_x > 450):
+            return False
+        return not (int(pos_x + 0.001) > 24 and int(pos_x - 0.01) < 440 - 25 - 15)
 
     def move(self, paddles, table_size, move_factor):
         moved = 0
@@ -161,8 +164,14 @@ class Ball:
                 moved = 1
                 #print "out of wall, position, speed: ", self.frect.pos, self.speed
 
+        '''
+        if(self.paddle_collision(self.frect.pos[0])):
+            print("BALL POSITION:", self.frect.pos)
+        '''
+
         for paddle in paddles:
             if self.frect.intersect(paddle.frect):
+                #print(f"BALL_POS = {self.frect.pos}")
                 if (paddle.facing == 1 and self.get_center()[0] < paddle.frect.pos[0] + paddle.frect.size[0]/2) or \
                 (paddle.facing == 0 and self.get_center()[0] > paddle.frect.pos[0] + paddle.frect.size[0]/2):
                     continue
@@ -369,9 +378,9 @@ def init_game():
     dust_error = 0.00
     init_speed_mag = 2
     timeout = 0.0003
-    clock_rate = 90
+    clock_rate = 1000
     turn_wait_rate = 3
-    score_to_win = 50
+    score_to_win = 10000
 
 
     screen = pygame.display.set_mode(table_size)
@@ -381,10 +390,10 @@ def init_game():
                Paddle((table_size[0]-20, table_size[1]/2), paddle_size, paddle_speed, max_angle, 0, timeout)]
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
-    import chaser_ai, ted_ai
+    import pong_ai, ted_ai, FebreezeGlou_ai, pong_aiv1, bot_ai
     
-    paddles[0].move_getter = chaser_ai.pong_ai
-    paddles[1].move_getter = ted_ai.pong_ai #chaser_ai.pong_ai
+    paddles[0].move_getter = pong_ai.pong_ai
+    paddles[1].move_getter = bot_ai.pong_ai #chaser_ai.pong_ai
     
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
