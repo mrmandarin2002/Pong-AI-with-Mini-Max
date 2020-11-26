@@ -49,7 +49,6 @@ def ball_final(pos_x, pos_y, vel_x, vel_y):
     while not paddle_collision(pos_x):
 
         if int(pos_y - 0.01) < 0 or int(pos_y + 0.01) + ball_size[1] > table_size[1]:
-            #print("ARRIVED")
             c = 0 
             while int(pos_y - 0.01) < 0 or int(pos_y + 0.01) + ball_size[1] > table_size[1]:  
                 pos_x += -0.1 * vel_x * move_factor
@@ -62,11 +61,12 @@ def ball_final(pos_x, pos_y, vel_x, vel_y):
                 pos_y += 0.1 * vel_y * move_factor
                 c = c - 1
         else:
+            print("ARRIVED")
             skip_num = skip(pos_x, pos_y, vel_x, vel_y, move_factor)
             pos_x += vel_x * move_factor * skip_num
             pos_y += vel_y * move_factor * skip_num
 
-    #print("ARRIVE")
+    print("ARRIVE")
 
     return pos_y
 
@@ -92,7 +92,6 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
 
     if paddle_dir == ball_dir:
         ball_final_pos = ball_final(ball_pos[0], ball_pos[1], ball_vel_x, ball_vel_y)
-        #print(ball_final_pos)
         paddle_placement = ball_final_pos - paddle_size[1] / 2
 
     if paddle_placement > paddle_pos[1]:

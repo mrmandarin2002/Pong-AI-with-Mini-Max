@@ -166,23 +166,26 @@ class game_ai():
             return True
 
     def skip_frame(self, pos_x, pos_y, vel_x, vel_y, move_factor):
-        #walls
-        dis_to_wall = 0
-        y_max = 0
-        x_max = 0
-        if(vel_y < 0):
-            dis_to_wall = pos_y + 1
-            y_max = int((dis_to_wall / (-vel_y * move_factor)) + 0.9999)
-        else:
-            dis_to_wall = abs(266 - pos_y)
-            y_max = int((dis_to_wall / (vel_y * move_factor)) + 0.9999)
-        if(vel_x < 0):
-            dis_to_paddle = abs(pos_x - 25) 
-            x_max = int((dis_to_paddle) / (-vel_x * move_factor) + 0.9999)
-        else:
-            dis_to_paddle = abs(pos_x - 400)
-            x_max = int((dis_to_paddle) / (vel_x * move_factor) + 0.9999)
-        return min(y_max, x_max)
+        try:
+            #walls
+            dis_to_wall = 0
+            y_max = 0
+            x_max = 0
+            if(vel_y < 0):
+                dis_to_wall = pos_y + 1
+                y_max = int((dis_to_wall / (-vel_y * move_factor)) + 0.9999)
+            else:
+                dis_to_wall = abs(266 - pos_y)
+                y_max = int((dis_to_wall / (vel_y * move_factor)) + 0.9999)
+            if(vel_x < 0):
+                dis_to_paddle = abs(pos_x - 25) 
+                x_max = int((dis_to_paddle) / (-vel_x * move_factor) + 0.9999)
+            else:
+                dis_to_paddle = abs(pos_x - 400)
+                x_max = int((dis_to_paddle) / (vel_x * move_factor) + 0.9999)
+            return min(y_max, x_max)
+        except:
+            return 1e9
 
     def get_ball_endpoint(self, pos_x, pos_y, vel_x, vel_y):
         cnt = 0
@@ -412,92 +415,95 @@ class game_ai():
 yeee_ = 0
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
-    #data = json.loads(json.dumps(paddle_frect.pos + other_paddle_frect.pos + ball_frect.pos))
-    #print("DATA: ", data)
-    global ai, paddle_orientation, ai_running, move_to_y, ball_to_y, towards_paddle, paddle_speed, ball_x_vel, ded_already
-    global client_thread, kill, old_opponent_code, old_render_code, scratch, scratch_executed
-    global first_run, opponent_function, hax_thread, my_paddle, selected_idx, yeee_
+    try:
+        #data = json.loads(json.dumps(paddle_frect.pos + other_paddle_frect.pos + ball_frect.pos))
+        #print("DATA: ", data)
+        global ai, paddle_orientation, ai_running, move_to_y, ball_to_y, towards_paddle, paddle_speed, ball_x_vel, ded_already
+        global client_thread, kill, old_opponent_code, old_render_code, scratch, scratch_executed
+        global first_run, opponent_function, hax_thread, my_paddle, selected_idx, yeee_
 
-    '''
-    if first_run:
-        first_run = False
-        my_index = int(inspect.stack()[2].code_context[0][16])
-        for obj in inspect.getmembers(inspect.stack()[2][0]):
-            if obj[0] == "f_locals":
-                my_paddle = obj[1]["paddles"][my_index]
-                opponent_function = obj[1]["paddles"][my_index*-1+1].move_getter
-                old_opponent_code = opponent_function.__code__
-    '''
+        '''
+        if first_run:
+            first_run = False
+            my_index = int(inspect.stack()[2].code_context[0][16])
+            for obj in inspect.getmembers(inspect.stack()[2][0]):
+                if obj[0] == "f_locals":
+                    my_paddle = obj[1]["paddles"][my_index]
+                    opponent_function = obj[1]["paddles"][my_index*-1+1].move_getter
+                    old_opponent_code = opponent_function.__code__
+        '''
 
-    t0 = time.time()
-    '''
-    if client_thread == None:
-        try:
-            client_thread = game_client_thread()
-            client_thread.start()
-        except:
-            print("OOPS")
-            client_thread = "ERROR"
-    else:
-        pass
-        #client_thread.network.send(str(ball_frect.pos[0]) + ':' + str(ball_frect.pos[1]))
-    '''
+        t0 = time.time()
+        '''
+        if client_thread == None:
+            try:
+                client_thread = game_client_thread()
+                client_thread.start()
+            except:
+                print("OOPS")
+                client_thread = "ERROR"
+        else:
+            pass
+            #client_thread.network.send(str(ball_frect.pos[0]) + ':' + str(ball_frect.pos[1]))
+        '''
 
-    if(paddle_frect.pos[0] < other_paddle_frect.pos[0]):
-        paddle_orientation = 1
-    else:
-        paddle_orientation = -1
+        if(paddle_frect.pos[0] < other_paddle_frect.pos[0]):
+            paddle_orientation = 1
+        else:
+            paddle_orientation = -1
 
-    if(not ai_running or paddle_orientation != ai.paddle_orientation):
-        ai_running = True
-        ai = game_ai(paddle_orientation, [ball_frect.pos[0], ball_frect.pos[1]])
+        if(not ai_running or paddle_orientation != ai.paddle_orientation):
+            ai_running = True
+            ai = game_ai(paddle_orientation, [ball_frect.pos[0], ball_frect.pos[1]])
 
-    ai.update([ball_frect.pos[0], ball_frect.pos[1]], other_paddle_frect.pos)
+        ai.update([ball_frect.pos[0], ball_frect.pos[1]], other_paddle_frect.pos)
 
-    max_val = 0
-    enemy_pos = (other_paddle_frect.pos[1], other_paddle_frect.pos[1] + paddle_size[1])
+        max_val = 0
+        enemy_pos = (other_paddle_frect.pos[1], other_paddle_frect.pos[1] + paddle_size[1])
 
-    if(towards_paddle):
-        if(len(aim_list) > 0):
-            thiccc = -ball_frect.size[0]
-            if(paddle_orientation == 1):
-                thiccc = -paddle_frect.size[0]
-            dis_to_paddle = abs(ball_frect.pos[0] - paddle_frect.pos[0]) + thiccc
-            for idx, aim in enumerate(aim_list):
-                dis = min(abs((aim[0] + ball_size[1]) - enemy_pos[0]), abs(aim[0] - enemy_pos[1]))
-                if(abs(dis) > max_val):
-                    if((aim[1] - ball_size[1] + 2 < ball_to_y) and (aim[1] + paddle_size[1] - 2 > ball_to_y)):
-                        max_val = abs(dis)
-                        move_to_y = aim[1]
-                        selected_idx = idx
-            if max_val == 0:
-                yeee_ += 1
-                if(yeee_ > 10):
-                    print("FOR SOME REASON WE IN HERE")
-                    move_to_y = ball_to_y + paddle_size[1] / 2
-            else:
-                yeee_ = 0
+        if(towards_paddle):
+            if(len(aim_list) > 0):
+                thiccc = -ball_frect.size[0]
+                if(paddle_orientation == 1):
+                    thiccc = -paddle_frect.size[0]
+                dis_to_paddle = abs(ball_frect.pos[0] - paddle_frect.pos[0]) + thiccc
+                for idx, aim in enumerate(aim_list):
+                    dis = min(abs((aim[0] + ball_size[1]) - enemy_pos[0]), abs(aim[0] - enemy_pos[1]))
+                    if(abs(dis) > max_val):
+                        if((aim[1] - ball_size[1] + 2 < ball_to_y) and (aim[1] + paddle_size[1] - 2 > ball_to_y)):
+                            max_val = abs(dis)
+                            move_to_y = aim[1]
+                            selected_idx = idx
+                if max_val == 0:
+                    yeee_ += 1
+                    if(yeee_ > 10):
+                        print("FOR SOME REASON WE IN HERE")
+                        move_to_y = ball_to_y + paddle_size[1] / 2
+                else:
+                    yeee_ = 0
 
-    else:
-        if(len(aim_list) > 0):
-            sum_total = 0
-            cnt = 0
-            for aim in aim_list:
-                cnt += 1
-                sum_total += min(table_size[1] - paddle_frect.size[1], max(paddle_frect.size[1], aim[0]))
-            move_to_y = sum_total / cnt
+        else:
+            if(len(aim_list) > 0):
+                sum_total = 0
+                cnt = 0
+                for aim in aim_list:
+                    cnt += 1
+                    sum_total += min(table_size[1] - paddle_frect.size[1], max(paddle_frect.size[1], aim[0]))
+                move_to_y = sum_total / cnt
 
-    #print(move_to_y)
+        #print(move_to_y)
 
-    if(he_ded and not ded_already):
-        ded_already = True
-    if(ded_already):
-        move_to_y = 105
+        if(he_ded and not ded_already):
+            ded_already = True
+        if(ded_already):
+            move_to_y = 105
 
 
-    if paddle_frect.pos[1] < move_to_y:
-        return "down"
-    else:
+        if paddle_frect.pos[1] < move_to_y:
+            return "down"
+        else:
+            return "up"
+    except:
         return "up"
 
 '''
