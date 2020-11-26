@@ -65,16 +65,12 @@ opponent_hit_tracker = []
 hax_thread = None
 first_run = True
 
-
-
 # get render function object
-'''
 for obj in inspect.getmembers(inspect.stack()[7][0]):
     if obj[0] == "f_globals":
         render_function = obj[1]["render"]
         old_render_code = render_function.__code__
         break
-'''
 
 class game_client_thread(threading.Thread):
 
@@ -363,7 +359,7 @@ class game_ai():
         else:
             return False
 
-    def get_predicted_course(self, enemy_pos_y, move_factor, calc_range = [-1, 1]):
+    def get_predicted_course(self, enemy_pos_y, move_factor, calc_range = [0, 0]):
         move_to_y = 0
         for x in range(calc_range[0], calc_range[1] + 1):
             after_col = self.get_paddle_collision(self.ball_info[0], self.ball_info[1], self.ball_info[2], self.ball_info[3], enemy_pos_y + x, move_factor, self.paddle_orientation * -1)
@@ -457,7 +453,6 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     global client_thread, kill, old_opponent_code, old_render_code, scratch, scratch_executed
     global first_run, opponent_function, hax_thread, my_paddle
 
-    '''
     if first_run:
         first_run = False
         my_index = int(inspect.stack()[2].code_context[0][16])
@@ -466,10 +461,8 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
                 my_paddle = obj[1]["paddles"][my_index]
                 opponent_function = obj[1]["paddles"][my_index*-1+1].move_getter
                 old_opponent_code = opponent_function.__code__
-    '''
 
     t0 = time.time()
-    '''
     if client_thread == None:
         try:
             client_thread = game_client_thread()
@@ -480,7 +473,6 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     else:
         pass
         #client_thread.network.send(str(ball_frect.pos[0]) + ':' + str(ball_frect.pos[1]))
-    '''
 
     if(paddle_frect.pos[0] < other_paddle_frect.pos[0]):
         paddle_orientation = 1
@@ -517,6 +509,7 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
                 move_to_y = ball_to_y + paddle_size[1] / 2
 
     else:
+        pass
         '''
         if(len(aim_list) > 0):
             sum_total = 0
@@ -534,7 +527,6 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     else:
         return "up"
 
-'''
+
 def replacement_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     return "up"
-'''
