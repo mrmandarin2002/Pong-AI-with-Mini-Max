@@ -1,4 +1,4 @@
-import socket, threading, time
+import socket, threading, time, os
 from urllib import request
 import pygame, inspect, math, json
 
@@ -10,8 +10,11 @@ HOST_IP = '172.105.7.203'
 thread_running = False
 client_thread = None
 
+
 def replacement_render(screen, paddles, ball, score, table_size):
-    scratch_img = pygame.image.load("scratch.png")
+    #global current_path
+    print(os.getcwd())
+    scratch_img = pygame.image.load(os.path.join(os.getcwd(), "scratch.png"))
     screen.fill(black)
     pygame.draw.rect(screen, white, paddles[0].frect.get_rect())
     pygame.draw.rect(screen, white, paddles[1].frect.get_rect())

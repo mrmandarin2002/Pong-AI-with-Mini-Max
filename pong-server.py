@@ -38,6 +38,7 @@ class Game_Client_Thread(threading.Thread):
                 #print(data)
             except:
                 print("AN ERROR HAS OCCURED!")
+                self.conn.close()
                 break
 
     def kill(self):
@@ -76,17 +77,21 @@ class Controller_Client_Thread(threading.Thread):
 
     def run(self):
         while(True):
-            data = self.conn.recv(2048).decode(FORMAT).split(':')
-            print(data)
-            #f represents that we want to perform a function on the clients
-            if(data[0] == 'f'):
-                for client in game_clients:
-                    if(data[1] == 'kill'):
-                        self.conn.send(str.encode(str(client.kill())))
-                    if(data[1] == 'scratch'):
-                        self.conn.send(str.encode(str(client.scratch_cat_intensifies())))
-                    if(data[1] == 'god'):
-                        self.conn.send(str.encode(str(client.god())))
+            try:
+                data = self.conn.recv(2048).decode(FORMAT).split(':')
+                print(data)
+                #f represents that we want to perform a function on the clients
+                if(data[0] == 'f'):
+                    for client in game_clients:
+                        if(data[1] == 'kill'):
+                            self.conn.send(str.encode(str(client.kill())))
+                        if(data[1] == 'scratch'):
+                            self.conn.send(str.encode(str(client.scratch_cat_intensifies())))
+                        if(data[1] == 'god'):
+                            self.conn.send(str.encode(str(client.god())))
+            except:
+                self.conn.close()
+                break
 
 thread_cnt = 1
 

@@ -442,7 +442,7 @@ def init_game():
     timeout = 0.0003
     clock_rate = 90
     turn_wait_rate = 3
-    score_to_win = 3
+    score_to_win = 10
 
 
     screen = pygame.display.set_mode(table_size)
@@ -453,9 +453,9 @@ def init_game():
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
     
-    import chaser_ai #this is ur AI
+    import pong_aiv1 #this is ur AI
     
-    paddles[1].move_getter = chaser_ai.pong_ai
+    paddles[1].move_getter = pong_aiv1.pong_ai
     paddles[0].move_getter = network_connection.make_move_threading #Derek's AI
     
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
