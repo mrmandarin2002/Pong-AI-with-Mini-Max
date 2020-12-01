@@ -93,7 +93,19 @@ class Client_Thread(threading.Thread):
         f = open("sample_case" + str(self.num) + ".txt", 'w')
         f.write(sentence)
         f.close()
-        return synonyms.build_semantic_descriptors_from_files(["sample_case" + str(self.num) + ".txt"])
+        self.current_dict = synonyms.build_semantic_descriptors_from_files(["sample_case" + str(self.num) + ".txt"])
+        return self.current_dict
+
+    def cosine_similarity(self, s):
+        temp_dict = {}
+        words = s.keys()
+        for word in words:
+            temp_dict[word] = {}
+        for word1 in words:
+            for word2 in words:
+                if(word1 != word2):
+                    temp_dict[word1][word2] = synonyms.cosine_similarity(s[word1], s[word2])
+        return temp_dict
 
 
     def run(self):
@@ -113,7 +125,9 @@ class Client_Thread(threading.Thread):
                         cnt = 0 
                         dict_ = json.dumps(self.get_my_output(self.current_sentences))
                         self.conn.send(str.encode(str(dict_)))
-                    
+                    elif(data[0] == 'get_cos'):
+                        cnt = 0
+                        self.conn.send(str.encode(json.dumps(self.cosine_similarity(self.current_dict))))
                     time.sleep(DELAY)
                 except Exception as e:
                     print("ERROR MESSAGE:", e)
