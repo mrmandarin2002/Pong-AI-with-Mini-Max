@@ -3,7 +3,7 @@ import socket, sys, threading, json, time
 from random import *
 import synonyms
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+temp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 
 PORT = 5555
 SERVER = ''
@@ -14,12 +14,12 @@ DELAY = 0.05
 SERVER_IP = socket.gethostbyname(SERVER)
 
 try:
-    s.bind((SERVER, PORT))
+    temp.bind((SERVER, PORT))
 
 except socket.error as e:
     print(str(e))
 
-#s.listen(2)
+temp.listen(2)
 print("Waiting for a connection")
 
 
@@ -121,15 +121,16 @@ class Client_Thread(threading.Thread):
 
 thread_cnt = 1
 while True:
-    try:
-        conn, addr = s.accept()
-        print(conn, addr)
-        print(f"Connection with {addr} established!")
-        conn.send(str.encode("Connection with MrMandarin's Server established!"))
-        clients.append(Client_Thread(addr, conn, thread_cnt))
-        clients[len(clients) - 1].start()
-        thread_cnt += 1
+    conn, addr = temp.accept()
+    print(conn, addr)
+    print(f"Connection with {addr} established!")
+    conn.send(str.encode("Connection with MrMandarin's Server established!"))
+    clients.append(Client_Thread(addr, conn, thread_cnt))
+    clients[len(clients) - 1].start()
+    thread_cnt += 1
+    '''
     except Exception as e:
         print("ERROR MESSAGE: ", e)
         print("Error Connecting")
+    '''
 
