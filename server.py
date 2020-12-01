@@ -107,12 +107,14 @@ class Client_Thread(threading.Thread):
                     print(data)
                     if(data[0] == 'get_sentences'):
                         cnt = 0
-                        print(self.make_sentences())
+                        sentence = self.make_sentences()
+                        self.conn.send(str.encode(str(len(sentence))))
                         self.conn.send(str.encode(self.make_sentences()))
                     elif(data[0] == 'get_dict'):
                         cnt = 0
-                        print(json.dumps(self.get_my_output(self.current_sentences)))
-                        self.conn.send(str.encode(str(json.dumps(self.get_my_output(self.current_sentences)))))
+                        dict_ = json.dumps(self.get_my_output(self.current_sentences)))
+                        self.conn.send(str.encode(str(len(dict_))))
+                        self.conn.send(str.encode(str(dict_)))
                     
                     time.sleep(DELAY)
                 except Exception as e:

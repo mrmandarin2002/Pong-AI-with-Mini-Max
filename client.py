@@ -22,14 +22,19 @@ class Network:
     def connect(self):
         self.client.connect(self.addr)
         self.client.send(str.encode('controller'))
-        received_message = self.client.recv(500000).decode(FORMAT)
+        received_message = self.client.recv(2048).decode(FORMAT)
         print(received_message)
 
     def send(self, function, data = ""):
         try:
             print(function +":" + str(data))
             self.client.send(str.encode(function +":" + str(data)))
-            return self.client.recv(500000).decode(FORMAT)
+            msg_length = self.client.recv(1000).decode(FORMAT)
+            msg = ""
+            while(len(msg) != msg_length):
+                msg += self.client.recv(10000).decode(FORMAT)
+            return msg
+            
         except socket.error as e:
             print(str(e))
             return False
@@ -39,7 +44,7 @@ class Network:
 
     def get_dict(self):
          temp = self.send("get_dict")
-         print("DICTIONARY: ", temp)
+         print("LENGTH: ", len(temp))
          return json.loads(temp)
         
 
