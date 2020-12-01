@@ -22,14 +22,14 @@ class Network:
     def connect(self):
         self.client.connect(self.addr)
         self.client.send(str.encode('controller'))
-        received_message = self.client.recv(2048).decode(FORMAT)
+        received_message = self.client.recv(500000).decode(FORMAT)
         print(received_message)
 
     def send(self, function, data = ""):
         try:
             print(function +":" + str(data))
             self.client.send(str.encode(function +":" + str(data)))
-            return self.client.recv(2048).decode(FORMAT)
+            return self.client.recv(500000).decode(FORMAT)
         except socket.error as e:
             print(str(e))
             return False
@@ -40,7 +40,6 @@ class Network:
     def get_dict(self):
          temp = self.send("get_dict")
          print("DICTIONARY: ", temp)
-         time.sleep(5)
          return json.loads(temp)
         
 
@@ -80,6 +79,8 @@ class client():
         print("COMPARING DICTIONARIES!")
         good = True
         for word in mandarin_dict.keys():
+            if(not good):
+                break
             values = mandarin_dict[word]
             for value in values.keys():
                 try:
@@ -104,13 +105,10 @@ class client():
         else:
             print("Here's the sentences:")
             print(sentences)
-            print('\n')
             print("Here's Mrmandarin's dict:")
             print(mandarin_dict)
-            print('\n')
             print("Here's YOUR dict:")
-            print(users_dict)
-            print('\n')
+            print(user_dict)
         return good
 
     def continuous_check(self):

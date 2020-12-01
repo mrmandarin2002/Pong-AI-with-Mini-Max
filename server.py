@@ -61,7 +61,7 @@ class Client_Thread(threading.Thread):
         sentence = ""
         current_sentence = ""
         sentences = []
-        for x in range(randint(5,20)):
+        for x in range(randint(2,10)):
             sz = len(sentence)
             y_range = randint(2, 5)
             words_in_sentence = []
@@ -72,11 +72,11 @@ class Client_Thread(threading.Thread):
                 words_in_sentence.append(word)
                 sentence += randomize_cap(word)
                 sentence += get_punc()
-            y1_range = randint(1, 3)
+            y1_range = randint(1, 2)
             for y in range(y1_range):
                 sentence += randomize_cap(self.current_words[randint(0, len(self.current_words) - 1)])
                 sentence += get_punc()
-            y2_range = randint(1,3)
+            y2_range = randint(1,2)
             for y in range(y2_range):
                 sentence += randomize_cap(words_in_sentence[randint(0, len(words_in_sentence) - 1)])
                 sentence += get_punc()
