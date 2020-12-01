@@ -126,7 +126,7 @@ while True:
         print(conn, addr)
         print(f"Connection with {addr} established!")
         conn.send(str.encode("Connection with MrMandarin's Server established!"))
-        clients.append(Client_Thread(addr, conn, cnt))
+        clients.append(Client_Thread(addr, conn, thread_cnt))
         clients[len(clients) - 1].start()
         thread_cnt += 1
     except Exception as e:
