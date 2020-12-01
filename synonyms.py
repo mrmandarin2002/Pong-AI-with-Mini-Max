@@ -196,11 +196,11 @@ print(cosine_similarity(a, b))
 print(cosine_similarity(a, c))
 '''
 
-
+'''
 t0 = time.time()
 sem_descriptors = build_semantic_descriptors_from_files(["wp.txt" , "sw.txt"])
 print("RUNTIME YEEE: ", time.time() - t0)
 #print(sem_descriptors['i'])
 res = run_similarity_test("test.txt", sem_descriptors, cosine_similarity)
 print(res, " percentage of the guesses were correct")
-
+'''
