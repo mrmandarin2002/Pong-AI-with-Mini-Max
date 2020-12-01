@@ -38,7 +38,10 @@ class Network:
         return self.send("get_sentences")
 
     def get_dict(self):
-        return json.loads(self.send("get_dict"))
+         temp = self.send("get_dict")
+         print("DICTIONARY: ", temp)
+         time.sleep(5)
+         return json.loads(temp)
         
 
 class client():
