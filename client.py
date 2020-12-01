@@ -3,7 +3,7 @@
 import socket, threading, json, contextlib, io, time
 from random import *
 
-synonyms = __import__("synonyms") #put your filename here (pls for the love of god run this shit in the same folder as your file (and for the love of jesus do not pyzo this))
+synonyms = __import__("Project_3") #put your filename here (pls for the love of god run this shit in the same folder as your file (and for the love of jesus do not pyzo this))
 
 HEADER = 16
 DELAY = 0.0 #hehehehe
@@ -55,7 +55,7 @@ class client():
         while(not_ended):
             print("Here are your options:")
             print("1 - Check Dict")
-            print("2 - Continuously Check Dict")
+            #print("2 - Continuously Check Dict")
             print("3 - Exit")
             s = input()
             if(s == '3'):
@@ -69,13 +69,16 @@ class client():
 
     def check(self):
         print('\n')
-        print("WE IN")
+        #print("WE IN")
         sentences = self.network.get_sentences()
         mandarin_dict = self.network.get_dict()
-        print("SENTENCES:", sentences)
-        print(mandarin_dict)
+        #print("SENTENCES:", sentences)
+        #print(mandarin_dict)
         f = open("sample_case.txt", "w", encoding = "latin1")
+        f.write(sentences)
+        f.close()
         user_dict = synonyms.build_semantic_descriptors_from_files(["sample_case.txt"])
+        #print('\n')
         print("COMPARING DICTIONARIES!")
         good = True
         for word in mandarin_dict.keys():

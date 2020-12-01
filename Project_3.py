@@ -1,6 +1,7 @@
+'''
 import swanns_way
 import war_and_peace
-
+'''
 '''Semantic Similarity: starter code
 
 Author: Michael Guerzhoy. Last modified: Nov. 14, 2016.
@@ -36,7 +37,7 @@ def cosine_similarity(vec1, vec2):
 def b_alt(sentences):
   print(sentences)
 
-def build_semantic_descriptorss(sentences):
+def build_semantic_descriptors(sentences):
     s = {}
     e = {}
     for sentence in sentences:
