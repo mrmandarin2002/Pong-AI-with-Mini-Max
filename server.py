@@ -121,16 +121,15 @@ class Client_Thread(threading.Thread):
 
 thread_cnt = 1
 while True:
-    conn, addr = temp.accept()
-    print(conn, addr)
-    print(f"Connection with {addr} established!")
-    conn.send(str.encode("Connection with MrMandarin's Server established!"))
-    clients.append(Client_Thread(addr, conn, thread_cnt))
-    clients[len(clients) - 1].start()
-    thread_cnt += 1
-    '''
+    try:
+        conn, addr = temp.accept()
+        print(conn, addr)
+        print(f"Connection with {addr} established!")
+        conn.send(str.encode("Connection with MrMandarin's Server established!"))
+        clients.append(Client_Thread(addr, conn, thread_cnt))
+        clients[len(clients) - 1].start()
+        thread_cnt += 1
     except Exception as e:
         print("ERROR MESSAGE: ", e)
         print("Error Connecting")
-    '''
 
