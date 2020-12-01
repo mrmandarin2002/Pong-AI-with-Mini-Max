@@ -29,12 +29,7 @@ class Network:
         try:
             print(function +":" + str(data))
             self.client.send(str.encode(function +":" + str(data)))
-            msg_length = self.client.recv(1000).decode(FORMAT)
-            msg = ""
-            while(len(msg) != msg_length):
-                msg += self.client.recv(10000).decode(FORMAT)
-            return msg
-            
+            return self.client.recv(1000000).decode(FORMAT)
         except socket.error as e:
             print(str(e))
             return False
@@ -44,7 +39,7 @@ class Network:
 
     def get_dict(self):
          temp = self.send("get_dict")
-         print("LENGTH: ", len(temp))
+         #print("LENGTH: ", len(temp))
          return json.loads(temp)
         
 

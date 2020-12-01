@@ -61,7 +61,7 @@ class Client_Thread(threading.Thread):
         sentence = ""
         current_sentence = ""
         sentences = []
-        for x in range(randint(2,10)):
+        for x in range(randint(2,6)):
             sz = len(sentence)
             y_range = randint(2, 5)
             words_in_sentence = []
@@ -108,12 +108,10 @@ class Client_Thread(threading.Thread):
                     if(data[0] == 'get_sentences'):
                         cnt = 0
                         sentence = self.make_sentences()
-                        self.conn.send(str.encode(str(len(sentence))))
                         self.conn.send(str.encode(self.make_sentences()))
                     elif(data[0] == 'get_dict'):
-                        cnt = 0
+                        cnt = 0 
                         dict_ = json.dumps(self.get_my_output(self.current_sentences))
-                        self.conn.send(str.encode(str(len(dict_))))
                         self.conn.send(str.encode(str(dict_)))
                     
                     time.sleep(DELAY)
