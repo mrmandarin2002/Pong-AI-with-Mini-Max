@@ -130,6 +130,7 @@ while True:
         clients[len(clients) - 1].start()
         thread_cnt += 1
     except Exception as e:
+        temp.close()
         print("ERROR MESSAGE: ", e)
         print("Error Connecting")
 
