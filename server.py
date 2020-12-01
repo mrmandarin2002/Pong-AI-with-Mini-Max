@@ -103,9 +103,12 @@ class Client_Thread(threading.Thread):
                 try:
                     data = self.conn.recv(2048).decode(FORMAT).split(':')
                     print(f"Received Data From {self.addr}")
+                    print(data)
                     if(data[0] == 'get_sentences'):
+                        print(self.make_sentences())
                         self.conn.send(str.encode(self.make_sentences()))
                     elif(data[0] == 'get_dict'):
+                        print(json.dumps(self.get_my_ouput(self.current_sentences)))
                         self.conn.send(str.encode(json.dumps(self.get_my_ouput(self.current_sentences))))
                     
                     time.sleep(DELAY)

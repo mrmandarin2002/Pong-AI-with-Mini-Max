@@ -27,7 +27,8 @@ class Network:
 
     def send(self, function, data = ""):
         try:
-            self.client.send(str.encode("a:" + str(data)))
+            print(function +":" + str(data))
+            self.client.send(str.encode(function +":" + str(data)))
             return self.client.recv(2048).decode(FORMAT)
         except socket.error as e:
             print(str(e))
@@ -37,7 +38,7 @@ class Network:
         return self.send("get_sentences")
 
     def get_dict(self):
-        return self.send("get_dict")
+        return json.loads(self.send("get_dict"))
         
 
 class client():
@@ -66,8 +67,11 @@ class client():
 
     def check(self):
         print('\n')
+        print("WE IN")
         sentences = self.network.get_sentences()
         mandarin_dict = self.network.get_dict()
+        print("SENTENCES:", sentences)
+        print(mandarin_dict)
         f = open("sample_case.txt", "w", encoding = "latin1")
         user_dict = synonyms.build_semantic_descriptors_from_files(["sample_case.txt"])
         print("COMPARING DICTIONARIES!")
