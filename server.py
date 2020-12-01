@@ -115,6 +115,7 @@ class Client_Thread(threading.Thread):
                 except Exception as e:
                     print("ERROR MESSAGE:", e)
                     print(f"Something with {self.addr} went wrong!")
+                    self.conn.close()
                     break
             else:
                 print("INFINITE LOOP!")
