@@ -97,19 +97,19 @@ def most_similar_word(word, choices, semantic_descriptors, similarity_fn):
 def run_similarity_test(filename, semantic_descriptors, similarity_fn):
   with open(filename, 'r', encoding='latin1')as f: text = f.read().split('\n')
   count_num = 0
-  count_den = len(text)
+  count_den = len(text) - 1
   for i in range(len(text)):
-    text[i] = text[i].split(" ")
-    word1 = text[i][0]
-    choices1 = text[i][2:]
-    n = similarity_fn(word1, choices1, semantic_descriptors, cosine_similarity)
-    if n == text[i][1]:
-      count_num += 1
-    elif n == '':
-      print(text[i][0])
-      count_den -= 1
-  print(count_den)
-  print(count_num)
+    if(text[i]):
+      text[i] = text[i].split(" ")
+      word1 = text[i][0]
+      choices1 = text[i][2:]
+      n = most_similar_word(word1, choices1, semantic_descriptors, similarity_fn)
+      if n == text[i][1]:
+        #print(text[i][1])
+        count_num += 1
+      elif n == '':
+        #print(text[i][0])
+        count_den -= 1
   return count_num / count_den * 100
 
 

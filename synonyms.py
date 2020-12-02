@@ -151,7 +151,7 @@ def build_semantic_descriptors_from_files(filenames):
 def most_similar_word(word, choices, semantic_descriptors, similarity_fn):
     word_dict = semantic_descriptors[word]
     current_max = 0
-    current_word = ""
+    current_word = choices[0]
     words = set(semantic_descriptors.keys())
     if(word in words):
         for choice in choices:
@@ -160,9 +160,7 @@ def most_similar_word(word, choices, semantic_descriptors, similarity_fn):
                 if(similarity > current_max):
                     current_max = similarity
                     current_word = choice
-        return current_word
-    else:
-        return ""
+    return current_word
 
 
 def run_similarity_test(filename, semantic_descriptors, similarity_fn):

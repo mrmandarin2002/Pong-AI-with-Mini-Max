@@ -5,7 +5,7 @@
 import socket, threading, json, contextlib, io, time
 from random import *
 
-synonyms = __import__("synonyms") #put your filename here (pls for the love of god run this shit in the same folder as your file (and for the love of jesus do not pyzo this))
+synonyms = __import__("Project_3") #put your filename here (pls for the love of god run this shit in the same folder as your file (and for the love of jesus do not pyzo this))
 
 HEADER = 16
 DELAY = 0.0 #hehehehe
@@ -198,14 +198,32 @@ class client():
                 print(f"Successful matches: {cnt}")
 
     def continuous_run(self):
+        good = True
+        cnt = 0
         print('\n')
-        sentences = self.network.get_sentences()
-        mandarin_dict = self.network.get_dict()
-        get_tests = self.network.get_tests()
-        f = open("sample_test.txt", "w", encoding = "latin1")
-        f.write(get_tests)
-        f.close()
-
-
+        while(good):
+            sentences = self.network.get_sentences()
+            f = open("sample_case.txt", "w", encoding = "latin1")
+            f.write(sentences)
+            f.close()
+            mandarin_dict = self.network.get_dict()
+            get_tests = self.network.get_tests()
+            f = open("sample_test.txt", "w", encoding = "latin1")
+            f.write(get_tests)
+            f.close()
+            result = synonyms.run_similarity_test("sample_test.txt", synonyms.build_semantic_descriptors_from_files(["sample_case.txt"]), synonyms.cosine_similarity)
+            if(int(result) != 100):
+                print("HMMM SOMETHING SEEMS TO BE OFF")
+                print("Can't really pinpoint why tbh but I'll provide you with the debugging info tho...")
+                print('\n')
+                print("Checkout sample_case.txt made in your folder for the sentences used")
+                print("Checkout sample_test.txt for the testing of run_similarity_test (also in your folder now)")
+                print('\n')
+                print("Here's my dict if that helps: ")
+                print(mandarin_dict)
+                good = False
+            else:
+                cnt += 1
+                print("Cases passed: ", cnt)
 root = client()
 root.run()
