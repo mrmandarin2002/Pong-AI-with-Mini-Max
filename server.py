@@ -121,7 +121,7 @@ class Client_Thread(threading.Thread):
                         sentence = self.make_sentences()
                         print(len(sentence))
                         self.conn.send(str.encode(str(len(sentence))))
-                        self.conn.send(str.encode(self.make_sentences()))
+                        self.conn.send(str.encode(str(sentence)))
                     elif(data[0] == 'get_dict'):
                         cnt = 0 
                         dict_ = json.dumps(self.get_my_output(self.current_sentences))
