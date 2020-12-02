@@ -180,7 +180,7 @@ class client():
                 if(good):
                     for word2 in words:
                         if(word2 in mandarin_cos[word1].keys()):
-                            if(mandarin_cos[word1][word2] != round(synonyms.cosine_similarity(mandarin_dict[word1], mandarin_dict[word2]), 3)):
+                            if(round(mandarin_cos[word1][word2], 5) != round(synonyms.cosine_similarity(mandarin_dict[word1], mandarin_dict[word2]), 5)):
                                 print("SOMETHING DOESN'T MATCH!")
                                 print(f"Cosine Similarity for {word1} and {word2} don't match!")
                                 print('\n')
