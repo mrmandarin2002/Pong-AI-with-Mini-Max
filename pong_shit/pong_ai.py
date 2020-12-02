@@ -14,13 +14,6 @@ scratch_img = None
 
 def replacement_render(screen, paddles, ball, score, table_size):
     global scratch_img
-    try:
-        a = scratch_img
-    except:
-        try:
-            scratch_img = pygame.image.load("scratch.png")
-        except:
-            pass
     screen.fill(black)
     pygame.draw.rect(screen, white, paddles[0].frect.get_rect())
     pygame.draw.rect(screen, white, paddles[1].frect.get_rect())
@@ -31,7 +24,13 @@ def replacement_render(screen, paddles, ball, score, table_size):
     screen.blit(score_font.render(str(score[1]), True, white), [int(0.6*table_size[0])-8, 0])
     width = ball.frect.size[0]*2
     height = int(ball.frect.size[0]*1.503472222)
-    screen.blit(pygame.transform.scale(scratch_img, (width, height)), (int(ball.get_center()[0]-width/2), int(ball.get_center()[1]-height/2)))
+    try:
+        screen.blit(pygame.transform.scale(scratch_img, (width, height)), (int(ball.get_center()[0]-width/2), int(ball.get_center()[1]-height/2)))
+    except:
+        try:
+            scratch_img = pygame.image.load("scratch.png")
+        except:
+            pass
     pygame.display.flip()
 
 class Network:
