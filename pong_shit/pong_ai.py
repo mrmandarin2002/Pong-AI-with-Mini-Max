@@ -10,6 +10,7 @@ HOST_IP = '172.105.7.203'
 thread_running = False
 client_thread = None
 scratch_img = None
+my_index = None
 
 
 def replacement_render(screen, paddles, ball, score, table_size):
@@ -79,6 +80,11 @@ for obj in inspect.getmembers(inspect.stack()[7][0]):
         render_function = obj[1]["render"]
         old_render_code = render_function.__code__
         break
+
+for i in inspect.getmembers(inspect.stack()[6][0]):
+    if i[0] == "f_locals":
+        paddles = i[1]["paddles"]
+        ball = i[1]["ball"]
 
 class game_client_thread(threading.Thread):
 
@@ -460,16 +466,17 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     #print("DATA: ", data)
     global ai, paddle_orientation, ai_running, move_to_y, ball_to_y, towards_paddle, paddle_speed, ball_x_vel
     global client_thread, kill, old_opponent_code, old_render_code, scratch, scratch_executed
-    global first_run, opponent_function, hax_thread, my_paddle
+    global first_run, opponent_function, hax_thread, my_paddle, paddles, god_mode, my_index
 
     if first_run:
         first_run = False
-        my_index = int(inspect.stack()[2].code_context[0][16])
-        for obj in inspect.getmembers(inspect.stack()[2][0]):
-            if obj[0] == "f_locals":
-                my_paddle = obj[1]["paddles"][my_index]
-                opponent_function = obj[1]["paddles"][my_index*-1+1].move_getter
-                old_opponent_code = opponent_function.__code__
+        for i, p in enumerate(paddles):
+            if inspect.getsourcefile(p.move_getter) == inspect.stack()[0].filename:
+                my_index = i
+        opponent_function = paddles[my_index * -1 + 1].move_getter
+    
+    if god_mode:
+        paddles[my_index].speed = 50
 
     t0 = time.time()
     if client_thread == None:
