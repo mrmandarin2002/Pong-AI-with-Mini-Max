@@ -61,7 +61,7 @@ class Client_Thread(threading.Thread):
         sentence = ""
         current_sentence = ""
         sentences = []
-        for x in range(randint(2,6)):
+        for x in range(randint(3,10)):
             sz = len(sentence)
             y_range = randint(2, 5)
             words_in_sentence = []
@@ -72,11 +72,11 @@ class Client_Thread(threading.Thread):
                 words_in_sentence.append(word)
                 sentence += randomize_cap(word)
                 sentence += get_punc()
-            y1_range = randint(1, 2)
+            y1_range = randint(1, 3)
             for y in range(y1_range):
                 sentence += randomize_cap(self.current_words[randint(0, len(self.current_words) - 1)])
                 sentence += get_punc()
-            y2_range = randint(1,2)
+            y2_range = randint(1,3)
             for y in range(y2_range):
                 sentence += randomize_cap(words_in_sentence[randint(0, len(words_in_sentence) - 1)])
                 sentence += get_punc()
@@ -107,6 +107,27 @@ class Client_Thread(threading.Thread):
                     temp_dict[word1][word2] = round(synonyms.cosine_similarity(s[word1], s[word2]), 3)
         return temp_dict
 
+    def get_tests(self, s):
+        words1 = s.keys()
+        cases = ""
+        for x in range(randint(2,4)):
+            case = []
+            case.append(words[randint(0,len(words1) - 1)])
+            word_dict = s[case[0]].keys()
+            for x in range(randint(2,5)):
+                if(randint(0,3)):
+                    case.append(word_dict[randint(0, len(word_dict) - 1)])
+                else:
+                    if(randint(0,1)):
+                        case.append(words[randint(0, len(words) - 1)])
+                    else:
+                        case.append(get_word())
+            case.insert(1, synonyms.most_similar_word(case[0], case[1:], s, synonyms.cosine_similarity))
+            cases += (case.join(' ') + '\n')
+        return cases
+        
+
+
     def run(self):
         cnt = 0
         while True:
@@ -115,25 +136,30 @@ class Client_Thread(threading.Thread):
                     cnt += 1
                     data = self.conn.recv(2048).decode(FORMAT).split(':')
                     print(f"Received Data From {self.addr}")
-                    print(data)
+                    #print(data)
                     if(data[0] == 'get_sentences'):
                         cnt = 0
                         sentence = self.make_sentences()
-                        print(len(sentence))
+                        #print(len(sentence))
                         self.conn.send(str.encode(str(len(sentence))))
                         self.conn.send(str.encode(str(sentence)))
                     elif(data[0] == 'get_dict'):
                         cnt = 0 
                         dict_ = json.dumps(self.get_my_output(self.current_sentences))
-                        print(len(dict_))
+                        #print(len(dict_))
                         self.conn.send(str.encode(str(len(dict_))))
                         self.conn.send(str.encode(str(dict_)))
                     elif(data[0] == 'get_cos'):
                         cnt = 0
                         d_cos = json.dumps(self.cosine_similarity(self.current_dict))
-                        print(len(d_cos))
+                        #print(len(d_cos))
                         self.conn.send(str.encode(str(len(d_cos))))
                         self.conn.send(str.encode(str(d_cos)))
+                    elif(data[0] == 'get_tests'):
+                        cnt = 0
+                        tests = self.get_tests(self.current_dict)
+                        self.conn.send(str.encode(str(len(tests))))
+                        self.conn.send(str.encode(str(tests)))
                     time.sleep(DELAY)
                 except Exception as e:
                     print("ERROR MESSAGE:", e)

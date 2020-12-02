@@ -1,5 +1,6 @@
 # No need to thank me but if you really want to express your gratitude 
 # feel free to get me some BBT once covid has passed :)
+# Also don't even try looking at this code it's f****** disgusting
 
 import socket, threading, json, contextlib, io, time
 from random import *
@@ -10,7 +11,7 @@ HEADER = 16
 DELAY = 0.0 #hehehehe
 PORT = 5555
 FORMAT = 'utf-8'
-HOST_IP = '172.105.7.203' #hey those trying to hack my server! there ain't shit on there so gl + my gomoku server is run within a try statement so good f****** luck trying to break that shit
+HOST_IP = '172.105.7.203' #hackers. Challenge accepted aight?
 
 class Network:
 
@@ -28,16 +29,16 @@ class Network:
 
     def send(self, function, data = ""):
         try:
-            print(function +":" + str(data))
+            #print(function +":" + str(data))
             self.client.send(str.encode(function +":" + str(data)))
             msg_length = int(self.client.recv(2048).decode(FORMAT))
-            print("MSG LENGTH: ", msg_length)
+            #print("MSG LENGTH: ", msg_length)
             temp = ""
             while(len(temp) < msg_length):
                 temp += self.client.recv(4096).decode(FORMAT)
-                print("IN", len(temp))
-                print(temp)
-            print("LENGTH OF DATA: ", len(temp))
+                #print("IN", len(temp))
+                #print(temp)
+            #print("LENGTH OF DATA: ", len(temp))
             return temp
         except socket.error as e:
             print(str(e))
@@ -53,6 +54,9 @@ class Network:
 
     def get_cos(self):
         return json.loads(self.send("get_cos"))
+
+    def get_tests(self):
+        return json.loads(self.send("get_tests"))
         
 
 class client():
@@ -168,7 +172,7 @@ class client():
             mandarin_dict = self.network.get_dict()
             mandarin_cos = self.network.get_cos()
             #print(mandarin_dict)
-            print(mandarin_cos)
+            #print(mandarin_cos)
             words = mandarin_dict.keys()
             for word1 in words:
                 if(good):
@@ -190,6 +194,16 @@ class client():
             if(good):
                 cnt += 1
                 print(f"Successful matches: {cnt}")
+
+    def continuous_run(self):
+        print('\n')
+        sentences = self.network.get_sentences()
+        mandarin_dict = self.network.get_dict()
+        get_tests = self.network.get_tests()
+        f = open("sample_test.txt", "w", encoding = "latin1")
+        f.write(get_tests)
+        f.close()
+
 
 root = client()
 root.run()
