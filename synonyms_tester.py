@@ -56,7 +56,7 @@ class Network:
         return json.loads(self.send("get_cos"))
 
     def get_tests(self):
-        return json.loads(self.send("get_tests"))
+        return self.send("get_tests")
         
 
 class client():
@@ -84,6 +84,8 @@ class client():
                 self.continuous_check()
             elif(s == '3'):
                 self.continuous_cosine()
+            elif(s == '4'):
+                self.continuous_run()
             else:
                 print("Dafuq you entered boii")
 

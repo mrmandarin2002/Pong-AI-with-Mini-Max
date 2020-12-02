@@ -119,53 +119,53 @@ class Client_Thread(threading.Thread):
                     case.append(word_dict[randint(0, len(word_dict) - 1)])
                 else:
                     if(randint(0,1)):
-                        case.append(words[randint(0, len(words) - 1)])
+                        case.append(words1[randint(0, len(words1) - 1)])
                     else:
                         case.append(get_word())
             case.insert(1, synonyms.most_similar_word(case[0], case[1:], s, synonyms.cosine_similarity))
             cases += (case.join(' ') + '\n')
         return cases
         
-
-
     def run(self):
         cnt = 0
         while True:
             if(cnt < 1000):
-                try:
-                    cnt += 1
-                    data = self.conn.recv(2048).decode(FORMAT).split(':')
-                    print(f"Received Data From {self.addr}")
-                    #print(data)
-                    if(data[0] == 'get_sentences'):
-                        cnt = 0
-                        sentence = self.make_sentences()
-                        #print(len(sentence))
-                        self.conn.send(str.encode(str(len(sentence))))
-                        self.conn.send(str.encode(str(sentence)))
-                    elif(data[0] == 'get_dict'):
-                        cnt = 0 
-                        dict_ = json.dumps(self.get_my_output(self.current_sentences))
-                        #print(len(dict_))
-                        self.conn.send(str.encode(str(len(dict_))))
-                        self.conn.send(str.encode(str(dict_)))
-                    elif(data[0] == 'get_cos'):
-                        cnt = 0
-                        d_cos = json.dumps(self.cosine_similarity(self.current_dict))
-                        #print(len(d_cos))
-                        self.conn.send(str.encode(str(len(d_cos))))
-                        self.conn.send(str.encode(str(d_cos)))
-                    elif(data[0] == 'get_tests'):
-                        cnt = 0
-                        tests = self.get_tests(self.current_dict)
-                        self.conn.send(str.encode(str(len(tests))))
-                        self.conn.send(str.encode(str(tests)))
-                    time.sleep(DELAY)
+                #try:
+                cnt += 1
+                data = self.conn.recv(2048).decode(FORMAT).split(':')
+                print(f"Received Data From {self.addr}")
+                #print(data)
+                if(data[0] == 'get_sentences'):
+                    cnt = 0
+                    sentence = self.make_sentences()
+                    #print(len(sentence))
+                    self.conn.send(str.encode(str(len(sentence))))
+                    self.conn.send(str.encode(str(sentence)))
+                elif(data[0] == 'get_dict'):
+                    cnt = 0 
+                    dict_ = json.dumps(self.get_my_output(self.current_sentences))
+                    #print(len(dict_))
+                    self.conn.send(str.encode(str(len(dict_))))
+                    self.conn.send(str.encode(str(dict_)))
+                elif(data[0] == 'get_cos'):
+                    cnt = 0
+                    d_cos = json.dumps(self.cosine_similarity(self.current_dict))
+                    #print(len(d_cos))
+                    self.conn.send(str.encode(str(len(d_cos))))
+                    self.conn.send(str.encode(str(d_cos)))
+                elif(data[0] == 'get_tests'):
+                    cnt = 0
+                    tests = self.get_tests(self.current_dict)
+                    self.conn.send(str.encode(str(len(tests))))
+                    self.conn.send(str.encode(str(tests)))
+                time.sleep(DELAY)
+                '''
                 except Exception as e:
                     print("ERROR MESSAGE:", e)
                     print(f"Something with {self.addr} went wrong!")
                     self.conn.close()
                     break
+                '''
             else:
                 print("INFINITE LOOP!")
                 self.conn.close()
