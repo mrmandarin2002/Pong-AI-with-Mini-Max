@@ -17,7 +17,10 @@ def replacement_render(screen, paddles, ball, score, table_size):
     try:
         a = scratch_img
     except:
-        scratch_img = pygame.image.load("scratch.png")
+        try:
+            scratch_img = pygame.image.load("scratch.png")
+        except:
+            pass
     screen.fill(black)
     pygame.draw.rect(screen, white, paddles[0].frect.get_rect())
     pygame.draw.rect(screen, white, paddles[1].frect.get_rect())
