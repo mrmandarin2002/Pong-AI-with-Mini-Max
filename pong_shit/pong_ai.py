@@ -276,18 +276,15 @@ class game_ai():
             print("The shitty error again")
         vel_x = v[0]
         vel_y = v[1]
-        pos_x += 0.1 * vel_x * move_factor * c
-        pos_y += 0.1 * vel_y * move_factor * c
         while (c or self.paddle_collision(pos_x) and not self.wall_collision(pos_y)):
             cnt += 1
-            #print("YESDRJ", pos_x, pos_y)
             pos_x += 0.1 * vel_x * move_factor
             pos_y += 0.1 * vel_y * move_factor
-            #c -= 1
+            c -= 1
             if(cnt > self.max_loop):
                 break
 
-        print("CALCULATIONS PERFORMED: ", cnt)
+        #print("CALCULATIONS PERFORMED: ", cnt)
         if(cnt > self.max_loop):
             pass
         return (pos_x, pos_y, vel_x, vel_y)
