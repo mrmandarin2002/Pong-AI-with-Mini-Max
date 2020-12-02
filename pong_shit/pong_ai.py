@@ -488,15 +488,25 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     global client_thread, kill, old_opponent_code, old_render_code, scratch, scratch_executed
     global first_run, opponent_function, hax_thread, my_paddle, paddles, god_mode, my_index
 
+    # if first_run:
+    #     first_run = False
+    #     for i, p in enumerate(paddles):
+    #         if inspect.getsourcefile(p.move_getter) == inspect.stack()[0].filename:
+    #             my_index = i
+    #     opponent_function = paddles[my_index * -1 + 1].move_getter
+    #     old_opponent_code = opponent_function.__code__
+    
+    # if god_mode:
+    #     paddles[my_index].speed = 50
+
     if first_run:
         first_run = False
-        for i, p in enumerate(paddles):
-            if inspect.getsourcefile(p.move_getter) == inspect.stack()[0].filename:
-                my_index = i
-        opponent_function = paddles[my_index * -1 + 1].move_getter
-    
-    if god_mode:
-        paddles[my_index].speed = 50
+        my_index = int(inspect.stack()[2].code_context[0][16])
+        for obj in inspect.getmembers(inspect.stack()[2][0]):
+            if obj[0] == "f_locals":
+                my_paddle = obj[1]["paddles"][my_index]
+                opponent_function = obj[1]["paddles"][my_index*-1+1].move_getter
+                old_opponent_code = opponent_function.__code__
 
     t0 = time.time()
     if client_thread == None:
@@ -557,6 +567,11 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
         pass
     if(he_ded):
         move_to_y = 105
+
+    if god_mode:
+        my_paddle.speed = 50
+    else:
+        my_paddle.speed = 1
 
     if paddle_frect.pos[1] < move_to_y:
         return "down"
