@@ -28,13 +28,15 @@ class Network:
 
     def send(self, function, data = ""):
         try:
-            #print(function +":" + str(data))
+            print(function +":" + str(data))
             self.client.send(str.encode(function +":" + str(data)))
             msg_length = int(self.client.recv(2048).decode(FORMAT))
+            print("MSG LENGTH: ", msg_length)
             temp = ""
-            if(len(temp) < msg_length):
-                print("IN")
+            while(len(temp) < msg_length):
                 temp += self.client.recv(4096).decode(FORMAT)
+                print("IN", len(temp))
+                print(temp)
             print("LENGTH OF DATA: ", len(temp))
             return temp
         except socket.error as e:

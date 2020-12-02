@@ -119,16 +119,19 @@ class Client_Thread(threading.Thread):
                     if(data[0] == 'get_sentences'):
                         cnt = 0
                         sentence = self.make_sentences()
+                        print(len(sentence))
                         self.conn.send(str.encode(str(len(sentence))))
                         self.conn.send(str.encode(self.make_sentences()))
                     elif(data[0] == 'get_dict'):
                         cnt = 0 
-                        self.conn.send(str.encode(str(len(dict_))))
                         dict_ = json.dumps(self.get_my_output(self.current_sentences))
+                        print(len(dict_))
+                        self.conn.send(str.encode(str(len(dict_))))
                         self.conn.send(str.encode(str(dict_)))
                     elif(data[0] == 'get_cos'):
                         cnt = 0
                         d_cos = json.dumps(self.cosine_similarity(self.current_dict))
+                        print(len(d_cos))
                         self.conn.send(str.encode(str(len(d_cos))))
                         self.conn.send(str.encode(str(d_cos)))
                     time.sleep(DELAY)
