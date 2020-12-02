@@ -70,6 +70,8 @@ class client():
                 self.check()
             elif(s == '2'):
                 self.continuous_check()
+            elif(s == '3'):
+                self.continuous_cosine()
             else:
                 print("Dafuq you entered boii")
 
@@ -154,32 +156,32 @@ class client():
         cnt = 0
         good = True
         while(good):
-            
             sentences = self.network.get_sentences()
             mandarin_dict = self.network.get_dict()
-            mandarin_cos = self.get_cos()
+            mandarin_cos = self.network.get_cos()
             print(mandarin_dict)
             print(mandarin_cos)
             words = mandarin_dict.keys()
             for word1 in words:
                 if(good):
                     for word2 in words:
-                        if(mandarin_cos[word1][word2] != synonyms.cosine_similarity(mandarin_dict[word1], mandarin_dict[word2])):
-                            print("SOMETHING DOESN'T MATCH!")
-                            print(f"Cosine Similarity for {word1} and {word2} don't match!")
-                            print('\n')
-                            print("MRMANDARIN'S VALUE:", mandarin_cos[word1][word2])
-                            print("YOUR VALUE:", synonyms.cosine_similarity(mandarin_dict[word1], mandarin_dict[word2]))
-                            print('\n')
-                            print("DICT1: ", mandarin_dict[word1])
-                            print("DICK2: ", mandarin_dict[word2])
-                            good = False
-                            break
+                        if(word2 in mandarin_cos[word1].keys()):
+                            if(mandarin_cos[word1][word2] != synonyms.cosine_similarity(mandarin_dict[word1], mandarin_dict[word2])):
+                                print("SOMETHING DOESN'T MATCH!")
+                                print(f"Cosine Similarity for {word1} and {word2} don't match!")
+                                print('\n')
+                                print("MRMANDARIN'S VALUE:", mandarin_cos[word1][word2])
+                                print("YOUR VALUE:", synonyms.cosine_similarity(mandarin_dict[word1], mandarin_dict[word2]))
+                                print('\n')
+                                print("DICT1: ", mandarin_dict[word1])
+                                print("DICK2: ", mandarin_dict[word2])
+                                good = False
+                                break
                 else:
                     break
             if(good):
                 cnt += 1
-                print(f"{cnt}, successful matches!")
+                print(f"Successful matches: {cnt}")
 
 root = client()
 root.run()

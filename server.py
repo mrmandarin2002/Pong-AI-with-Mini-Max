@@ -104,9 +104,8 @@ class Client_Thread(threading.Thread):
         for word1 in words:
             for word2 in words:
                 if(word1 != word2):
-                    temp_dict[word1][word2] = synonyms.cosine_similarity(s[word1], s[word2])
+                    temp_dict[word1][word2] = round(synonyms.cosine_similarity(s[word1], s[word2]), 3)
         return temp_dict
-
 
     def run(self):
         cnt = 0
