@@ -108,12 +108,12 @@ class Client_Thread(threading.Thread):
         return temp_dict
 
     def get_tests(self, s):
-        words1 = s.keys()
+        words1 = list(s.keys())
         cases = ""
         for x in range(randint(2,4)):
             case = []
             case.append(words1[randint(0,len(words1) - 1)])
-            word_dict = s[case[0]].keys()
+            word_dict = list(s[case[0]].keys())
             for x in range(randint(2,5)):
                 if(randint(0,3)):
                     case.append(word_dict[randint(0, len(word_dict) - 1)])
