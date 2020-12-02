@@ -112,7 +112,7 @@ class Client_Thread(threading.Thread):
         cases = ""
         for x in range(randint(2,4)):
             case = []
-            case.append(words[randint(0,len(words1) - 1)])
+            case.append(words1[randint(0,len(words1) - 1)])
             word_dict = s[case[0]].keys()
             for x in range(randint(2,5)):
                 if(randint(0,3)):
