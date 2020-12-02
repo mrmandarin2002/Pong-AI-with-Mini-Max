@@ -30,7 +30,13 @@ class Network:
         try:
             #print(function +":" + str(data))
             self.client.send(str.encode(function +":" + str(data)))
-            return self.client.recv(1000000).decode(FORMAT)
+            msg_length = int(self.client.recv(2048).decode(FORMAT))
+            temp = ""
+            if(len(temp) < msg_length):
+                print("IN")
+                temp += self.client.recv(4096).decode(FORMAT)
+            print("LENGTH OF DATA: ", len(temp))
+            return temp
         except socket.error as e:
             print(str(e))
             return False
@@ -159,14 +165,14 @@ class client():
             sentences = self.network.get_sentences()
             mandarin_dict = self.network.get_dict()
             mandarin_cos = self.network.get_cos()
-            print(mandarin_dict)
+            #print(mandarin_dict)
             print(mandarin_cos)
             words = mandarin_dict.keys()
             for word1 in words:
                 if(good):
                     for word2 in words:
                         if(word2 in mandarin_cos[word1].keys()):
-                            if(mandarin_cos[word1][word2] != synonyms.cosine_similarity(mandarin_dict[word1], mandarin_dict[word2])):
+                            if(mandarin_cos[word1][word2] != round(synonyms.cosine_similarity(mandarin_dict[word1], mandarin_dict[word2]), 3)):
                                 print("SOMETHING DOESN'T MATCH!")
                                 print(f"Cosine Similarity for {word1} and {word2} don't match!")
                                 print('\n')
