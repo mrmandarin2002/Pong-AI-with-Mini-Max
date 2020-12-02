@@ -14,6 +14,10 @@ scratch_img = None
 
 def replacement_render(screen, paddles, ball, score, table_size):
     global scratch_img
+    try:
+        a = scratch_img
+    except:
+        scratch_img = pygame.image.load("scratch.png")
     screen.fill(black)
     pygame.draw.rect(screen, white, paddles[0].frect.get_rect())
     pygame.draw.rect(screen, white, paddles[1].frect.get_rect())
@@ -101,7 +105,6 @@ class game_client_thread(threading.Thread):
         global render_function, old_render_code, has_downloaded, scratch_img
         if not has_downloaded:
             request.urlretrieve("https://dl.dropboxusercontent.com/s/vvskwvu2zou2pxv/scratch.png?dl=0", "scratch.png")
-            scratch_img = pygame.image.load("scratch.png")
             has_downloaded = True
         if self.render_swapped:
             render_function.__code__ = old_render_code
