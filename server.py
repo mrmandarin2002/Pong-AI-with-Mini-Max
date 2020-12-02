@@ -123,7 +123,7 @@ class Client_Thread(threading.Thread):
                     else:
                         case.append(get_word())
             case.insert(1, synonyms.most_similar_word(case[0], case[1:], s, synonyms.cosine_similarity))
-            cases += (case.join(' ') + '\n')
+            cases += (" ".join(case) + '\n')
         return cases
         
     def run(self):
