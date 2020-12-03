@@ -169,6 +169,7 @@ def run_similarity_test(filename, semantic_descriptors, similarity_fn):
     tests = [chunk.split(' ') for chunk in temp]
     #sprint(tests)
     tot_right = 0
+    total_cnt = len(tests)
     for test in tests:
         if(len(test) > 2):
             #print(test)
@@ -177,22 +178,12 @@ def run_similarity_test(filename, semantic_descriptors, similarity_fn):
             options = test[2:]
             if(most_similar_word(word, options, semantic_descriptors, similarity_fn) == real_ans):
                 tot_right += 1
+        else:
+            total_cnt -= 1
     f.close()
     if(tot_right == 0):
         return -1
-    return (tot_right / (len(tests) - 1)) * 100.0
-
-'''
-d = build_semantic_descriptors_from_files(["wp.txt", "sw.txt"])
-a = d["trip"]
-
-b = d["party"]
-c = d["journey"]
-
-print(a, "\n", b, "\n", c)
-print(cosine_similarity(a, b))
-print(cosine_similarity(a, c))
-'''
+    return (tot_right / (total_cnt) * 100.0)
 
 '''
 t0 = time.time()

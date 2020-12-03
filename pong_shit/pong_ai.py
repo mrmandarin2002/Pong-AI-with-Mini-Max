@@ -238,8 +238,8 @@ class game_ai():
                 pos_x += vel_x * move_factor * frames_to_skip
                 pos_y += vel_y * move_factor * frames_to_skip
         if(cnt > self.max_loop):
-            print("LOOPED BITCHES")
-            print(pos_x, pos_y, vel_x, vel_y)
+            #print("LOOPED BITCHES")
+            #print(pos_x, pos_y, vel_x, vel_y)
             pass
         return (pos_x, pos_y, vel_x, vel_y)
 
@@ -283,7 +283,8 @@ class game_ai():
                 v[1] = (v[1]/abs(v[1]))*math.sqrt(v[0]**2 + v[1]**2 - 1) 
                 v[0] = (2*facing-1) 
         except:
-            print("The shitty error again")
+            pass
+            #print("The shitty error again")
         vel_x = v[0]
         vel_y = v[1]
         while c > 0 or (self.paddle_collision(pos_x) and not self.wall_collision(pos_y)):
@@ -328,7 +329,7 @@ class game_ai():
         self.ball_info = self.get_ball_endpoint(self.ball_pos[0], self.ball_pos[1], self.ball_vel[0], self.ball_vel[1])
         move_to_y = self.ball_info[1]
         ball_to_y = self.ball_info[1]
-        print("BALL ENDPOINT!: ", self.ball_info)
+        #print("BALL ENDPOINT!: ", self.ball_info)
         self.calc_hits(self.ball_info[0], self.ball_info[1], self.ball_info[2], self.ball_info[3], enemy = False)
         #print("CALC TIME:", time.time() - t0)
 
@@ -336,7 +337,7 @@ class game_ai():
         #print("IN ENEMY CALC")
         t0 = time.time()
         self.ball_info = self.get_ball_endpoint(self.ball_pos[0], self.ball_pos[1], self.ball_vel[0], self.ball_vel[1])
-        print("BALL ENDPOINT! ENEMY!:", self.ball_info)
+        #print("BALL ENDPOINT! ENEMY!:", self.ball_info)
         #self.calc_hits(self.ball_info[0], self.ball_info[1], self.ball_info[2], self.ball_info[3], enemy = True)
         #print("PRESUMED BALL PLACEMENT: ", move_to_y_test + paddle_size[1] / 2)
         #print("IN2")

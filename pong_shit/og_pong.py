@@ -375,7 +375,7 @@ def init_game():
     dust_error = 0.00
     init_speed_mag = 2
     timeout = 0.0001
-    clock_rate = 500
+    clock_rate = 1000
     turn_wait_rate = 3
     score_to_win = 10000
 
@@ -387,10 +387,10 @@ def init_game():
                Paddle((table_size[0]-20, table_size[1]/2), paddle_size, paddle_speed, max_angle, 0, timeout)]
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
-    import pong_ai, minified_ai, FebreezeGlou_ai
+    import pong_ai, minified_ai, FebreezeGlou_ai, donkey_pong
     
     paddles[0].move_getter = pong_ai.pong_ai
-    paddles[1].move_getter = minified_ai.pong_ai #chaser_ai.pong_ai
+    paddles[1].move_getter = donkey_pong.pong_ai #chaser_ai.pong_ai
     
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)

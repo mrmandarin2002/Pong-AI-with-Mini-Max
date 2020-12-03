@@ -363,7 +363,6 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     max_val = 0
     enemy_pos = (other_paddle_frect.pos[1], other_paddle_frect.pos[1] + paddle_size[1])
 
-
     if(towards_paddle):
         if(len(aim_list) > 0):
 
