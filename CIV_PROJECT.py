@@ -5,6 +5,8 @@ import math
 matboard_length = 813
 matboard_width = 1016
 matboard_height = 1.27
+matboard_tensile_strength = 30
+matboard_compressive_strength = 6
 
 def get_area_pi_beam(length, web_height, bent_length, support_length = 0, width = 100, top_layers = 2, web_layers = 2):
     return ((length * width * top_layers) + ((web_height + bent_length) * web_layers * length)) + support_length * width
@@ -39,16 +41,26 @@ def get_i_Pi_beam(web_height, width, bent_length, horizontal_layers, web_layers)
 
     I += (width * ((horizontal_layers * matboard_height) ** 3)) / 12
     I += (2 * web_layers * matboard_height * (web_height ** 3)) / 12
-    I += (2 * bent_length * (web_layers * matboard_height) ** 3) / 12
+    I += (2 * bent_length * matboard_height * (web_layers * matboard_height) ** 3) / 12
 
-    return I
+    print("Y:", y_bar)
 
-#get_i_Pi_beam(75, 100, 10, 2, 1) 
-get_i_Pi_beam(100, 120, 10, 2, 1)
+    return [I, y_bar]
 
+test = get_i_Pi_beam(75, 100, 10, 2, 1)
+#get_i_Pi_beam(100, 120, 10, 2, 1)
 #print("I TEST:", get_i_I_beam(150, 100, 3, 4))
 
+def get_maximum_p(strength, max_moment, y_bar, I):
+    return (I * strength) / (y_bar * (max_moment * 1000))
+
+print(get_maximum_p(matboard_tensile_strength, 0.0854, test[1], test[0]))
+print(get_maximum_p(matboard_compressive_strength, 0.0854, 77.54 - test[1], test[0]))
+
 class beam:
+
+    def get_maximum_p(self, strength, max_moment, y_bar, I):
+        return (I * strength) / (y_bar * max_moment)
 
     def __init__(self, beam_type, length, width, web_height, angle = 0, bent_length = None, support_length = 0, horizontal_layers = 2, web_layers = 1):
         if(beam_type == "pi"):
@@ -57,6 +69,7 @@ class beam:
             self.area = get_area_i_beam(length, width, web_height, horizontal_layers, web_layers)
         elif(beam_type == 'variable'):
             self.area = get_area_variable_pi_beam(length, angle, center_beam_width, web_layers)
+
 
 class bridge:
     

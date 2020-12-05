@@ -1,9 +1,4 @@
-def fact(n):
-    print(n)
-    if n == 0:
-        return 1
-    ans =  n * fact(n-1)
-    print("RETURNING:", ans)
-    return ans
+test_list = ["Hello", "yeee", "boii", 1, 2, [1,2,3]]
 
-print(fact(5))
+for item in test_list:
+    print(item)
