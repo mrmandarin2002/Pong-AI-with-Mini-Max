@@ -76,8 +76,8 @@ class Paddle:
         self.speed = factor*self.speed
 
     def move(self, enemy_frect, ball_frect, table_size):
-        direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
-        # direction = timeout(self.move_getter, (self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size)), {}, self.timeout)
+        #direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
+        direction = timeout(self.move_getter, (self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size)), {}, self.timeout)
         if direction == "up":
             self.frect.move_ip(0, -self.speed)
         elif direction == "down":
@@ -163,8 +163,11 @@ class Ball:
                 moved = 1
                 #print "out of wall, position, speed: ", self.frect.pos, self.speed
 
+        '''
         if(self.paddle_collision(self.frect.pos[0])):
-            print("BALL POSITION:", self.frect.pos)
+            pass
+            #print("BALL POSITION:", self.frect.pos)
+        '''
 
         for paddle in paddles:
             if self.frect.intersect(paddle.frect):
@@ -377,7 +380,7 @@ def init_game():
     timeout = 0.0001
     clock_rate = 1000
     turn_wait_rate = 3
-    score_to_win = 10000
+    score_to_win = 100
 
 
     screen = pygame.display.set_mode(table_size)
@@ -387,10 +390,10 @@ def init_game():
                Paddle((table_size[0]-20, table_size[1]/2), paddle_size, paddle_speed, max_angle, 0, timeout)]
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
-    import pong_ai, minified_ai, FebreezeGlou_ai, donkey_pong, pong_aiv3
+    import pong_ai, minified_ai,  donkey_pong, pong_aiv3, pong_aiv2
     
-    paddles[0].move_getter = pong_aiv3.pong_ai
-    paddles[1].move_getter = donkey_pong.pong_ai #chaser_ai.pong_ai
+    paddles[0].move_getter = pong_ai.pong_ai
+    paddles[1].move_getter = minified_ai.pong_ai #chaser_ai.pong_ai
     
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)

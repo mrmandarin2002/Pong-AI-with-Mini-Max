@@ -1,7 +1,3 @@
-'''
-import swanns_way
-import war_and_peace
-'''
 '''Semantic Similarity: starter code
 
 Author: Michael Guerzhoy. Last modified: Nov. 14, 2016.
@@ -13,8 +9,7 @@ import math
 # def norm(vec):
 #     '''Return the norm of a vector stored as a dictionary,
 #     as described in the handout for Project 3.
-#     '''pProject 3
-
+#     '''
 
 #     sum_of_squares = 0.0
 #     for x in vec:
@@ -48,7 +43,6 @@ def build_semantic_descriptors(sentences):
           s[key].pop(key)
         else:
           e = d.copy()
-          # Below this is O(n^2)
           for key2 in d:
             if key2 != key:
               if key2 in s[key]:
@@ -57,29 +51,39 @@ def build_semantic_descriptors(sentences):
             else:
               e.pop(key2)
         s[key].update(e)
+        e.clear()
     return s
 
 def build_semantic_descriptors_from_files(filenames):
-  full_text = []
+  full_text = ''
   for i in range(len(filenames)):
     with open(filenames[i], 'r', encoding='latin1')as f: text = f.read()
-    mid_array = [',', '-', '--', ':', ';']
-    for elem in mid_array:
-      if elem == '-' or elem == '--':
-        text = text.replace(elem, ' ')
-      text = text.replace(elem, '')
-    text = text.replace('\n\n', ' ')
-    text = text.replace('\n', ' ')
-    end_array = ['?','!']
-    for elem in end_array:
-      text = text.replace(elem, '.')
-    text = text.replace('. ', '.')
-    text = text.lower().split('.')
-    for i in range(len(text)):
-      text[i] = text[i].replace('  ', ' ')
-      text[i] = text[i].split(' ')
     full_text += text
+  full_text = strip_text(full_text)
   return build_semantic_descriptors(full_text)
+
+def strip_text(text):
+  word = ''
+  words = []
+  sentences = []
+  text = text.lower()
+
+  special_char_array = ['.', '?', '!', ' ', '\n', ',', ':', ';', '-', '--']
+  for i in range(len(text)):
+    if text[i] in special_char_array:
+      if text[i] != None:
+        if word != '':
+          words.append(word)
+          word = ''
+    if text[i] in special_char_array[:3]:
+      if len(words):
+        if '' in words:
+          words.remove('')
+        sentences.append(words.copy())
+        words.clear()
+    if text[i] not in special_char_array:
+      word += text[i]
+  return sentences
 
 def most_similar_word(word, choices, semantic_descriptors, similarity_fn):
   max = 0
@@ -97,18 +101,20 @@ def most_similar_word(word, choices, semantic_descriptors, similarity_fn):
 def run_similarity_test(filename, semantic_descriptors, similarity_fn):
   with open(filename, 'r', encoding='latin1')as f: text = f.read().split('\n')
   count_num = 0
-  count_den = len(text) - 1
+  count_den = len(text)
   for i in range(len(text)):
     if(text[i]):
       text[i] = text[i].split(" ")
+      print("TEXT: ", text[i])
       word1 = text[i][0]
       choices1 = text[i][2:]
       n = most_similar_word(word1, choices1, semantic_descriptors, similarity_fn)
+      print("CHOICE: ", text)
       if n == text[i][1]:
-        #print(text[i][1])
         count_num += 1
       elif n == '':
-        #print(text[i][0])
+        count_den -= 1
+      else:
         count_den -= 1
   return count_num / count_den * 100
 
@@ -117,7 +123,7 @@ if __name__ == '__main__':
   #vec1 = {"a": 1, "b": 2, "c": 3}
   #vec2 = {"b": 4, "c": 5, "d": 6}
   #print(cosine_similarity(vec1, vec2))
-  #print(build_semantic_descriptors([["i", "am", "a", "sick", "man"], ["i", "am", "a", "spiteful", "man"], ["i", 'am', 'an', 'unattractive', 'man'], ['however', 'i', 'know', 'nothing', 'at', 'all', 'about', 'my', 'disease', 'and', 'do', 'not', 'know', 'for', 'certain', 'what', 'ails', 'me']]))
-  #print(build_semantic_descriptors_from_files(['war_and_peace.txt', 'swanns_way.txt']))
+  #print(build_semantic_descriptors([["i", "am", "a", "sick", "man", "man"]]))
+  #print(build_semantic_descriptors_from_files(['input.txt']))
   #print(most_similar_word("man", ['you', 'war', 'hand', 'battle', 'foot', 'eyes', 'face', 'woman', 'boot', 'where'], build_semantic_descriptors_from_files(["war_and_peace.txt", "swanns_way.txt"]), cosine_similarity))
-  print(run_similarity_test("test.txt", build_semantic_descriptors_from_files(["war_and_peace.txt", "swanns_way.txt"]), most_similar_word))
+  print(run_similarity_test("test.txt", build_semantic_descriptors_from_files(["war_and_peace.txt", "swanns_way.txt"]), cosine_similarity))

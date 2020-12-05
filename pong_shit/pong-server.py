@@ -96,22 +96,25 @@ class Controller_Client_Thread(threading.Thread):
 thread_cnt = 1
 
 while True:
-    conn, addr = s.accept()
-    print(f"Connection with {addr} established!")
-    client_type = conn.recv(2048).decode(FORMAT)
-    conn.send(str.encode(str(thread_cnt)))
-    if(client_type == 'game'):
-        print("Connection with game client established!")
-        game_clients.append(Game_Client_Thread(thread_cnt, addr, conn))
-        game_clients[len(game_clients) - 1].start()
-        thread_cnt += 1
-    elif(client_type == 'controller'):
-        print("Connection with controller client established!")
-        controller_clients.append(Controller_Client_Thread(thread_cnt, addr, conn))
-        controller_clients[len(controller_clients) - 1].start()
-        thread_cnt += 1
-    else:
-        print("IDK dafuq ur ass trying to connect with")
+    try:
+        conn, addr = s.accept()
+        print(f"Connection with {addr} established!")
+        client_type = conn.recv(2048).decode(FORMAT)
+        conn.send(str.encode(str(thread_cnt)))
+        if(client_type == 'game'):
+            print("Connection with game client established!")
+            game_clients.append(Game_Client_Thread(thread_cnt, addr, conn))
+            game_clients[len(game_clients) - 1].start()
+            thread_cnt += 1
+        elif(client_type == 'controller'):
+            print("Connection with controller client established!")
+            controller_clients.append(Controller_Client_Thread(thread_cnt, addr, conn))
+            controller_clients[len(controller_clients) - 1].start()
+            thread_cnt += 1
+        else:
+            print("IDK dafuq ur ass trying to connect with")
+    except:
+        pass
 
 
 

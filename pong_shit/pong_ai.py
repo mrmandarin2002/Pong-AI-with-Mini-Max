@@ -393,6 +393,10 @@ class game_ai():
         if(inv_move_factor > 0):
             move_factor = 1.0 / inv_move_factor
         calc_range = [0,0]
+        
+        #print(self.prev_enemy_vel)
+
+        
         cnt = 0
         for i in range(len(self.prev_enemy_vel) - 2, -1, -1):
             #print("I", i)
@@ -405,7 +409,8 @@ class game_ai():
             calc_range[0] += cnt
         elif(cnt > 0):
             calc_range[1] += cnt
-        move_to_y = self.get_predicted_course(enemy_pos_y, move_factor)
+
+        move_to_y = self.get_predicted_course(enemy_pos_y, move_factor, calc_range)
         #print(move_to_y)
 
 
@@ -499,7 +504,7 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     
     # if god_mode:
     #     paddles[my_index].speed = 50
-
+    '''
     if first_run:
         first_run = False
         my_index = int(inspect.stack()[2].code_context[0][16])
@@ -519,6 +524,7 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
             client_thread = "ERROR"
     else:
         pass
+    '''
 
     if(paddle_frect.pos[0] < other_paddle_frect.pos[0]):
         paddle_orientation = 1
@@ -533,7 +539,6 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
 
     max_val = 0
     enemy_pos = (other_paddle_frect.pos[1], other_paddle_frect.pos[1] + paddle_size[1])
-
 
     if(towards_paddle):
         if(len(aim_list) > 0):
@@ -568,12 +573,12 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
         pass
     if(he_ded):
         move_to_y = 105
-
+    '''
     if god_mode:
         my_paddle.speed = 50
     else:
         my_paddle.speed = 1
-
+    '''
     if paddle_frect.pos[1] < move_to_y:
         return "down"
     else:

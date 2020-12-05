@@ -32,13 +32,11 @@ def cosine_similarity(vec1, vec2):
 
 
 def build_semantic_descriptors(sentences):
-    t0 = time.time()
     s = {}
     words_in = set()
     for sentence in sentences:
         words = list({word.lower() for word in sentence})
         visited = [word in words_in for word in words]
-        #print(s)
         for idx, word1 in enumerate(words):
             for x in range(idx + 1, len(words)):
                 if(visited[idx]):
@@ -63,8 +61,6 @@ def build_semantic_descriptors(sentences):
                         words_in.add(words[x])
                         visited[x] = True
                         s[words[x]] = {word1 : 1}
-
-    #print("RUNTIME NEW: ", time.time() - t0)
     return s
 
 def process_text(text):
