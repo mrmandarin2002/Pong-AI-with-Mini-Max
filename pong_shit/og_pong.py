@@ -387,9 +387,9 @@ def init_game():
                Paddle((table_size[0]-20, table_size[1]/2), paddle_size, paddle_speed, max_angle, 0, timeout)]
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
-    import pong_ai, minified_ai, FebreezeGlou_ai, donkey_pong
+    import pong_ai, minified_ai, FebreezeGlou_ai, donkey_pong, pong_aiv3
     
-    paddles[0].move_getter = pong_ai.pong_ai
+    paddles[0].move_getter = pong_aiv3.pong_ai
     paddles[1].move_getter = donkey_pong.pong_ai #chaser_ai.pong_ai
     
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)

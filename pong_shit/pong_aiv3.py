@@ -2,7 +2,11 @@ import socket, threading, time, os
 from urllib import request
 import pygame, math, json
 
+
 thread_running = False
+client_thread = None
+
+
 ai = None
 ai_running = False
 paddle_orientation = None
@@ -19,6 +23,7 @@ ball_x_vel = 0
 he_ded = False
 my_paddle = None
 hit_avg = 35
+selected_idx = 0
 
 class game_ai():
 
@@ -40,13 +45,14 @@ class game_ai():
         self.score_checked = False
         self.score = [0,0]
         self.prev_predicted_endpoint = -1e9
-        self.prev_enemy_pos = [0,0]
+        self.prev_enemy_pos = 0
+        self.prev_enemy_vel = [1, -1, 1, -1, 1]
 
     def wall_collision(self, pos_y):
         return (int(pos_y - 0.001) < 0 or (int(pos_y + 0.001) + ball_size[1] > table_size[1]))
 
     def paddle_collision(self, pos_x):
-        if (int(pos_x + 0.001) > 24 and int(pos_x - 0.01) < table_size[0] - 25 - ball_size[0]):
+        if (int(pos_x) > 24 and int(pos_x) < table_size[0] - 25 - ball_size[0]):
             return False
         else:
             return True
@@ -163,7 +169,7 @@ class game_ai():
             #print("The shitty error again")
         vel_x = v[0]
         vel_y = v[1]
-        while (c or self.paddle_collision(pos_x) and not self.wall_collision(pos_y)):
+        while c > 0 or (self.paddle_collision(pos_x) and not self.wall_collision(pos_y)):
             cnt += 1
             #print("YESDRJ", pos_x, pos_y)
             pos_x += 0.1 * vel_x * move_factor
@@ -214,15 +220,7 @@ class game_ai():
         t0 = time.time()
         self.ball_info = self.get_ball_endpoint(self.ball_pos[0], self.ball_pos[1], self.ball_vel[0], self.ball_vel[1])
         #print("BALL ENDPOINT! ENEMY!:", self.ball_info)
-        self.calc_hits(self.ball_info[0], self.ball_info[1], self.ball_info[2], self.ball_info[3], enemy = True)
-        '''
-        sum_total = 0
-        cnt = 0
-        for aim in aim_list:
-            cnt += 1
-            sum_total += min(table_size[1] - paddle_size[1], aim[0] + paddle_size[1] / 2)
-        move_to_y_test = sum_total / cnt
-        '''
+        #self.calc_hits(self.ball_info[0], self.ball_info[1], self.ball_info[2], self.ball_info[3], enemy = True)
         #print("PRESUMED BALL PLACEMENT: ", move_to_y_test + paddle_size[1] / 2)
         #print("IN2")
         #print("CALC TIME:", time.time() - t0)
@@ -267,7 +265,7 @@ class game_ai():
         #move_to_y = (move_to_y + self.prev_predicted_endpoint) / 2
         #self.prev_predicted_endpoint = move_to_y
         #print(move_to_y)
-        return move_to_y
+        return move_to_y - paddle_size[1] / 2
 
     def predict_enemy_hit(self, enemy_pos_y):
         global move_to_y
@@ -276,11 +274,25 @@ class game_ai():
         move_factor = 1
         if(inv_move_factor > 0):
             move_factor = 1.0 / inv_move_factor
+        calc_range = [0,0]
+        cnt = 0
+        for i in range(len(self.prev_enemy_vel) - 2, -1, -1):
+            #print("I", i)
+            #print(self.prev_enemy_vel)
+            if(self.prev_enemy_vel[i] ==self.prev_enemy_vel[i + 1]):
+                cnt += self.prev_enemy_vel[i]
+            else:
+                break
+        if(cnt < 0):
+            calc_range[0] += cnt
+        elif(cnt > 0):
+            calc_range[1] += cnt
         move_to_y = self.get_predicted_course(enemy_pos_y, move_factor)
+        #print(move_to_y)
 
 
     def update(self, ball_pos, enemy_pos):
-        global ball_to_y, move_to_y, paddle_orientation, towards_paddle, ball_x_vel, he_ded
+        global ball_to_y, move_to_y, paddle_orientation, towards_paddle, ball_x_vel, he_ded, selected_idx
         if(abs(self.prev_ball_pos[0] - ball_pos[0]) > 100):
             self.calculated = False
             self.enemy_calculated = False
@@ -293,6 +305,17 @@ class game_ai():
         self.ball_vel = [self.ball_pos[0] - self.prev_ball_pos[0], self.ball_pos[1] - self.prev_ball_pos[1]]
         ball_x_vel = self.ball_vel[0]
 
+        #print("YEE: ", self.prev_enemy_vel)
+        if(self.prev_enemy_pos < enemy_pos[1]):
+            self.prev_enemy_vel.append(1)
+        elif(self.prev_enemy_pos == enemy_pos[1]):
+            self.prev_enemy_vel.append(0)
+        else:
+            self.prev_enemy_vel.append(-1)
+
+        del self.prev_enemy_vel[0]
+
+        self.prev_enemy_pos = enemy_pos[1]
 
         towards_paddle = self.towards_paddle()
         #self.update_score(self.ball_pos[0])
@@ -323,7 +346,7 @@ class game_ai():
                 if(ball_x_vel != 0):
                     time_to_paddle = abs(dis_to_paddle / ball_x_vel)
                     dis_paddle_to_end = self.paddle_dis_to_ball(self.ball_info[1], enemy_pos[1])
-                    if(time_to_paddle < dis_paddle_to_end - 10):
+                    if(time_to_paddle < dis_paddle_to_end - 5):
                         he_ded = True
                     else:
                         he_ded = False
@@ -342,11 +365,8 @@ class game_ai():
 
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
-    #data = json.loads(json.dumps(paddle_frect.pos + other_paddle_frect.pos + ball_frect.pos))
-    #print("DATA: ", data)
     global ai, paddle_orientation, ai_running, move_to_y, ball_to_y, towards_paddle, paddle_speed, ball_x_vel
-    global client_thread, kill, old_opponent_code, old_render_code, scratch, scratch_executed
-    global first_run, opponent_function, hax_thread, my_paddle
+    global my_paddle, paddles, god_mode, my_index
 
 
     if(paddle_frect.pos[0] < other_paddle_frect.pos[0]):
@@ -363,28 +383,38 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     max_val = 0
     enemy_pos = (other_paddle_frect.pos[1], other_paddle_frect.pos[1] + paddle_size[1])
 
+
     if(towards_paddle):
         if(len(aim_list) > 0):
-
             thiccc = -ball_frect.size[0]
             if(paddle_orientation == 1):
                 thiccc = -paddle_frect.size[0]
             dis_to_paddle = abs(ball_frect.pos[0] - paddle_frect.pos[0]) + thiccc
+            time_to_paddle = 1e9
+            if(ball_x_vel != 0):
+                time_to_paddle = abs(dis_to_paddle / ball_x_vel)
+            #print(time_to_paddle)
             #print(dis_to_paddle)
-
+            temp_idx = -1
             for idx, aim in enumerate(aim_list):
-                dis = min(abs((aim[0] + ball_size[1]) - enemy_pos[0]), abs(aim[0] - enemy_pos[1]))
-                if(abs(dis) > max_val):
-                    if((aim[1] - ball_size[1] + 2 < ball_to_y) and (aim[1] + paddle_size[1] - 2 > ball_to_y)):
-                        max_val = abs(dis)
-                        move_to_y = aim[1]
+                if(aim[2] != 0):
+                    dis = min(abs((aim[0] + ball_size[1]) - enemy_pos[0]), abs(aim[0] - enemy_pos[1]))
+                    if(abs(dis) > max_val):
+                        if((aim[1] - ball_size[1] + 2 < ball_to_y) and time_to_paddle > abs(aim[1] - paddle_frect.pos[1])):
+                            max_val = abs(dis)
+                            move_to_y = aim[1]
+                            temp_idx = idx
+            '''
+            if(temp_idx != -1):
+                print(aim_list[temp_idx][1], paddle_frect.pos[1])
+                print(aim_list[temp_idx][0])
+            '''
 
             if max_val == 0:
                 move_to_y = ball_to_y - paddle_size[1] / 2
 
     else:
         pass
-
     if(he_ded):
         move_to_y = 105
 

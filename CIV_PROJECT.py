@@ -22,7 +22,7 @@ def get_i_I_beam(web_height, width, horizontal_layers, web_layers):
     return I
 
 def get_i_Pi_beam(web_height, width, horizontal_layers, web_layers):
-    y_bar = 
+    y_bar = ((web_height))
 
 print("I TEST:", get_i_I_beam(150, 100, 3, 4))
 
@@ -35,8 +35,6 @@ class beam:
             self.area = get_area_i_beam(length, width, web_height, horizontal_layers, web_layers)
         elif(beam_type == 'variable'):
             self.area = get_area_variable_pi_beam(length, angle, center_beam_width, web_layers)
-
-
 
 class bridge:
     
@@ -55,14 +53,14 @@ point_load_loc = 280
 
 bridge_length = 950
 bridge_width = 100
-main_beam_height = 30
+main_beam_height = 100
 main_beam_h_layers = 2
-main_beam_v_layers = 2
+main_beam_v_layers = 1
 main_beam_angle = 45
 center_beam_width = 150
 center_beam_height = 600 - math.tan(main_beam_angle) * ((bridge_length / 2) - point_load_loc - center_beam_width / 2)
-center_beam_h_layers = 3
-center_beam_v_layers = 4
+center_beam_h_layers = 4
+center_beam_v_layers = 2
 
 main_beam = beam('pi', bridge_length, bridge_width, main_beam_height, bent_length = 10, horizontal_layers = main_beam_h_layers, web_layers = main_beam_v_layers, support_length = 30)
 variable_main_beam = beam('variable', bridge_length - point_load_loc * 2, bridge_width, 0, main_beam_angle, web_layers = main_beam_v_layers)

@@ -30,33 +30,6 @@ def cosine_similarity(vec1, vec2):
     #print(top, bottom1, bottom2)
     return (top / (math.sqrt(bottom1 * bottom2)))
 
-#print(cosine_similarity({"a": 1, "b": 2, "c": 3}, {"b": 4, "c": 5, "d": 6}))        
-'''
-def build_semantic_descriptorss(sentences):
-    t0 = time.time()
-    s = {}
-    e = {}
-    for sentence in sentences:
-      d = dict.fromkeys(sentence, 1)
-      for key in d:
-        if s.get(key) == None:
-          s[key] = d.copy()
-          s[key].pop(key)
-        else:
-          e = d.copy()
-          # Below this is O(n^2)
-          for key2 in d:
-            if key2 != key:
-              if key2 in s[key]:
-                s[key][key2] += 1
-                e.pop(key2)
-            else:
-              e.pop(key2)
-        s[key].update(e)
-
-    print("RUNTIME NEW: ", time.time() - t0)
-    return s
-'''
 
 def build_semantic_descriptors(sentences):
     t0 = time.time()
@@ -91,17 +64,8 @@ def build_semantic_descriptors(sentences):
                         visited[x] = True
                         s[words[x]] = {word1 : 1}
 
-    print("RUNTIME NEW: ", time.time() - t0)
+    #print("RUNTIME NEW: ", time.time() - t0)
     return s
-
-'''
-test_sentences = []
-dict1 = (build_semantic_descriptors(test_sentences))
-dict2 = (build_semantic_descriptorss(test_sentences))
-'''
-
-
-#print(dict1)
 
 def process_text(text):
     temp = ""
@@ -113,22 +77,21 @@ def process_text(text):
         if(text[i] == '!' or text[i] == '?' or text[i] == '.'):
             if(len(current_words)):
                 #print(current_words)
+                if(current_word):
+                    current_words.append(current_word)
+                    current_word = ""
                 sentences.append(copy.copy(current_words))
                 #print(sentences)
                 current_words.clear()
-        elif(text[i] == ' ' or text[i] == '\n' or text[i] == '\x80' or text[i] == 'â' or text[i] == '-' or text[i] == ',' or text[i] ==':' or text[i] == ';'):
+        elif(text[i] == ' ' or text[i] == '\n' or text[i] == '-' or text[i] == ',' or text[i] ==':' or text[i] == ';'):
             if(current_word):
                 current_words.append(current_word)
                 current_word = ""
         else:
             current_word += text[i]
     #text1 = temp.replace('\n', ' ')
-    #print(sentences)
+    #print("PROCESSED TEXT:", sentences)
     return sentences
-
-def test_loop(text):
-    for i in range(0, len(text)):
-        pass
     
 
 def build_semantic_descriptors_from_files(filenames):
@@ -137,13 +100,15 @@ def build_semantic_descriptors_from_files(filenames):
         f = open(file, "r", encoding="latin1")
         text += f.read()
         f.close()
-    
+    #print("TEXT: ", text)
     sentences = process_text(text)
-    print("LENGTH OF SENTENCES", len(sentences))
+    #print(sentences)
+    #print("LENGTH OF SENTENCES", len(sentences))
     yee =  build_semantic_descriptors(sentences)
-
+    #print("YEE: ", yee)
     return yee
 
+#print(build_semantic_descriptors_from_files(["sample_case2.txt"]))
 #eyyy = build_semantic_descriptors_from_files(["custom_test.txt"])
 #print(eyyy)
 #print(eyyy["cats"])
@@ -181,9 +146,7 @@ def run_similarity_test(filename, semantic_descriptors, similarity_fn):
         else:
             total_cnt -= 1
     f.close()
-    if(tot_right == 0):
-        return -1
-    return (tot_right / (total_cnt) * 100.0)
+    return ((tot_right / (total_cnt)) * 100.0)
 
 '''
 t0 = time.time()
