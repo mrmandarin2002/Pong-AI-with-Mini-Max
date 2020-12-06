@@ -398,13 +398,8 @@ def init_game():
     
     pygame.display.flip()
     clock.tick(4)
-    
     paddles[0].move_getter, paddles[1].move_getter = paddles[1].move_getter, paddles[0].move_getter
-    
-    game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
-    
-    
-    
+    game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)  
     pygame.quit()
 
 

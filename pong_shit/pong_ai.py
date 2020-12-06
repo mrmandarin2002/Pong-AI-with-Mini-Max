@@ -41,9 +41,6 @@ class Network:
         self.conn.connect(self.addr)
         self.conn.send(str.encode('game'))
         received_message = self.conn.recv(2048).decode()
-        if(received_message):
-            print("Succesfully connected to server!")
-        print(received_message)
         return received_message
 
     def send(self, data):
@@ -475,7 +472,6 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     enemy_pos = (other_paddle_frect.pos[1], other_paddle_frect.pos[1] + paddle_size[1])
 
     if(towards_paddle):
-
         if(len(aim_list) > 0):
             thiccc = -ball_frect.size[0]
             if(paddle_orientation == 1):
