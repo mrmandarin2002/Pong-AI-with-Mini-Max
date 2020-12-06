@@ -131,7 +131,6 @@ paddle_speed = 1
 ball_x_vel = 0
 he_ded = False
 my_paddle = None
-other_paddle = None
 
 HEADER = 16
 PORT = 5050
@@ -431,7 +430,7 @@ heinnie = True
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
     global ai, paddle_orientation, ai_running, move_to_y, ball_to_y, towards_paddle, paddle_speed, ball_x_vel
     global client_thread, kill, old_opponent_code, old_render_code, scratch, scratch_executed
-    global first_run, opponent_function, hax_thread, my_paddle, paddles, god_mode, my_index, heinnie, other_paddle
+    global first_run, opponent_function, hax_thread, my_paddle, paddles, god_mode, my_index, heinnie
 
     if first_run:
         try:
@@ -440,7 +439,6 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
             for obj in inspect.getmembers(inspect.stack()[2][0]):
                 if obj[0] == "f_locals":
                     my_paddle = obj[1]["paddles"][my_index]
-                    other_paddle = obj[1]["paddles"][my_index * -1 + 1]
                     opponent_function = obj[1]["paddles"][my_index*-1+1].move_getter
                     old_opponent_code = opponent_function.__code__
         except:
@@ -501,15 +499,9 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
 
     if(heinnie):
         if god_mode:
-            if paddle_orientation >= 0:
-                my_paddle.speed = 50
-                other_paddle.speed = 1
-            else:
-                other_paddle.speed = 50
-                my_paddle.speed = 1
+            my_paddle.speed = 50
         else:
             my_paddle.speed = 1
-            other_paddle.speed = 1
 
     if paddle_frect.pos[1] < move_to_y:
         return "down"
