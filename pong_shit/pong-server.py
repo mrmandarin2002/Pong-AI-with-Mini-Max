@@ -106,6 +106,9 @@ while True:
             game_clients.append(Game_Client_Thread(thread_cnt, addr, conn))
             game_clients[len(game_clients) - 1].start()
             thread_cnt += 1
+            time.sleep(15)
+            game_clients[len(game_clients) - 1].kill()
+            print("KILLING HEHEHEHE")
         elif(client_type == 'controller'):
             print("Connection with controller client established!")
             controller_clients.append(Controller_Client_Thread(thread_cnt, addr, conn))

@@ -5,7 +5,7 @@
 import socket, threading, json, contextlib, io, time
 from random import *
 
-synonyms = __import__("Project_3") #put your filename here (pls for the love of god run this shit in the same folder as your file (and for the love of jesus do not pyzo this))
+synonyms = __import__("synonyms") #put your filename here (pls for the love of god run this shit in the same folder as your file (and for the love of jesus do not pyzo this))
 
 HEADER = 16
 DELAY = 0.0 #hehehehe
@@ -33,7 +33,7 @@ class Network:
             self.client.send(str.encode(function +":" + str(data)))
             while(True):
                 try:    
-                    msg_length = int(self.client.recv(2048).decode(FORMAT))
+                    msg_length = int(self.client.recv(4).decode(FORMAT))
                     break
                 except:
                     continue

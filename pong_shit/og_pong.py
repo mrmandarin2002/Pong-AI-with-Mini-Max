@@ -76,8 +76,8 @@ class Paddle:
         self.speed = factor*self.speed
 
     def move(self, enemy_frect, ball_frect, table_size):
-        direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
-        #direction = timeout(self.move_getter, (self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size)), {}, self.timeout)
+        #direction = self.move_getter(self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size))
+        direction = timeout(self.move_getter, (self.frect.copy(), enemy_frect.copy(), ball_frect.copy(), tuple(table_size)), {}, self.timeout)
         if direction == "up":
             self.frect.move_ip(0, -self.speed)
         elif direction == "down":
@@ -105,9 +105,6 @@ class Paddle:
         sign = 1-2*self.facing
 
         return sign*rel_dist_from_c*self.max_angle*math.pi/180
-
-
-
 
 
 class Ball:
@@ -378,9 +375,9 @@ def init_game():
     dust_error = 0.00
     init_speed_mag = 2
     timeout = 0.0001
-    clock_rate = 120
+    clock_rate = 200
     turn_wait_rate = 3
-    score_to_win = 100
+    score_to_win = 10
 
 
     screen = pygame.display.set_mode(table_size)
@@ -390,10 +387,10 @@ def init_game():
                Paddle((table_size[0]-20, table_size[1]/2), paddle_size, paddle_speed, max_angle, 0, timeout)]
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)
 
-    import pong_ai, minified_ai,  donkey_pong, pong_aiv3, pong_aiv2
+    import pong_ai, minified_ai,  donkey_pong, pong_aiv3, pong_aiv2, bot_ai, test_ai
     
-    paddles[0].move_getter = pong_ai.pong_ai
-    paddles[1].move_getter = pong_aiv3.pong_ai #chaser_ai.pong_ai
+    paddles[0].move_getter = pong_aiv3.pong_ai
+    paddles[1].move_getter = pong_ai.pong_ai #chaser_ai.pong_ai
     
     game_loop(screen, paddles, ball, table_size, clock_rate, turn_wait_rate, score_to_win, 1)
     ball = Ball(table_size, ball_size, paddle_bounce, wall_bounce, dust_error, init_speed_mag)

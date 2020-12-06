@@ -1,105 +1,121 @@
+ball_sz = [15, 15]
+table_sz = [440, 280]
+paddle_sz = [10, 70]
+last_x = 0
+last_y = 0
 
-table_size = [440, 280]
-paddle_size = [10, 70]
-ball_size = [15, 15]
+prev_x_position = 0.0
+prev_y_position = 0.0
 
-prev_pos_x = 0
-prev_pos_y = 0
 
-def p_collision(pos_x):
-    if int(pos_x) > 24 and int(pos_x) < 400:
-        return False
-    return True
 
-def skip_frame(pos_x, pos_y, vel_x, vel_y, move_factor):
+def paddle(x_position):
+    return not (int(x_position) > 24 and int(x_position) < 400)
+
+def frames(x_position, y_position, x_velocity, y_velocity, forward_movement):
     try:
-        #walls
-        dis_to_wall = 0
-        y_max = 0
-        x_max = 0
-        if(vel_y < 0):
-            dis_to_wall = pos_y + 1
-            y_max = int((dis_to_wall / (-vel_y * move_factor)) + 0.999999)
+
+        y_dis = 0
+        longest_y = 0
+        longest_x = 0
+
+        if y_velocity < 0:
+            y_dis = y_position + 1
+            longest_y = int(y_dis / (-y_velocity * forward_movement) + 0.9999)
+
         else:
-            dis_to_wall = abs(266 - pos_y)
-            y_max = int((dis_to_wall / (vel_y * move_factor)) + 0.999999)
-        if(vel_x < 0):
-            dis_to_paddle = abs(pos_x - 25) 
-            x_max = int((dis_to_paddle) / (-vel_x * move_factor) + 0.999999)
+            y_dis = abs(266 - y_position)
+            longest_y = int(y_dis / (y_velocity * forward_movement) + 0.9999)
+
+        if x_velocity < 0:
+            x_dis = abs(x_position - 25)
+            longest_x = int(x_dis / (-x_velocity * forward_movement) + 0.9999)
+
         else:
-            dis_to_paddle = abs(pos_x - 400)
-            x_max = int((dis_to_paddle) / (vel_x * move_factor) + 0.999999)
-        return min(y_max, x_max)
+            x_dis = abs(x_position - 400)
+            longest_x = int(x_dis /  (x_velocity * forward_movement) + 0.9999)
+        if longest_y < longest_x:
+            return longest_y
+        else:
+            return longest_x
     except:
-        return 1e9
+        return 11111111111
 
-def wall_collision(pos_y):
-    return int(pos_y - 0.001) < 0 or (int(pos_y + 0.001) + 15 > 280)
+def collides(y_position):
+    if int(y_position - 0.001) < 0 or int(y_position + 0.001) + 15 > 280:
+        return True
+    return False
 
-def ball_final(pos_x, pos_y, vel_x, vel_y):
-    cnt = 0
-    max_loop = 5000
-    inv_move_factor = int((vel_x**2+vel_y**2)**.5)
-    move_factor = 1
-    if inv_move_factor > 0:
-        move_factor = 1.0 / inv_move_factor
 
-    while not p_collision(pos_x):
-        cnt += 1
-        if cnt > max_loop:
+def position_velocity(x_position, y_position, x_velocity, y_velocity):
+    counter = 0
+    max_counter = 10000
+    backwards_movement = int(( x_velocity ** 2 + y_velocity ** 2) ** .5)
+    forward_movement = 1
+
+
+    if backwards_movement > 0:
+
+        forward_movement = 1.0 / backwards_movement
+
+    while not paddle(x_position):
+        #print(x_position)
+        counter += 1
+        if counter > max_counter:
             break
-        if wall_collision(pos_y):
-            c = 0 
-            while wall_collision(pos_y):  
-                cnt += 1
-                pos_x += -0.1 * vel_x * move_factor
-                pos_y += -0.1 * vel_y * move_factor
-                c += 1 
-                if cnt > max_loop:
+
+
+        elif collides(y_position):
+            counter2 = 0
+            while collides(y_position):
+                counter += 1
+                x_position += -0.1 * x_velocity * forward_movement
+                y_position += -0.1 * y_velocity * forward_movement
+                counter2 += 1
+                if counter > max_counter:
                     break
-            vel_y = -vel_y
-            while c > 0 or wall_collision(pos_y):
-                cnt += 1
-                pos_x += 0.1 * vel_x * move_factor
-                pos_y += 0.1 * vel_y * move_factor
-                c -= 1 
-                if cnt > max_loop:
+
+            y_velocity = -y_velocity
+            while counter2 > 0 or collides(y_position):
+                counter += 1
+                x_position += 0.1 * x_velocity * forward_movement
+                y_position += 0.1 * y_velocity * forward_movement
+                counter2 -= 1
+                if counter > max_counter:
                     break
         else:
-            frames_to_skip = skip_frame(pos_x, pos_y, vel_x, vel_y, move_factor)
-            pos_x += vel_x * move_factor * frames_to_skip
-            pos_y += vel_y * move_factor * frames_to_skip
-    if cnt > max_loop:
-        pass
-    return pos_y
+            skipper = frames(x_position, y_position, x_velocity, y_velocity, forward_movement)
+            x_position += x_velocity * forward_movement * skipper
+            y_position += y_velocity * forward_movement * skipper
+
+    return y_position
+
 
 def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
-    global prev_pos_x, prev_pos_y
+    global prev_x_position, prev_y_position
 
-    ball_pos = ball_frect.pos
-    paddle_pos = paddle_frect.pos
-    ball_vel_x = ball_pos[0] - prev_pos_x
-    ball_vel_y = ball_pos[1] - prev_pos_y
-    prev_pos_x = ball_pos[0]
-    prev_pos_y = ball_pos[1]
-    paddle_dir = 1
+    position_ball, paddle_pos = ball_frect.pos, paddle_frect.pos
+    ball_x_velocity = position_ball[0] - prev_x_position
+    ball_y_velocity = position_ball[1] - prev_y_position
+    prev_x_position, prev_y_position = position_ball[0], position_ball[1]
+    direction = 1
 
     if paddle_pos[0] < other_paddle_frect.pos[0]:
-        paddle_dir = -1
+        direction = -1
 
-    if(ball_vel_x == 0):
-        ball_vel_x = 1
-    ball_dir = ball_vel_x / abs(ball_vel_x) 
-    paddle_placement = 105 #where the paddle goes
+    if ball_x_velocity == 0:
+        ball_x_velocity = 1
+    ball_dir = ball_x_velocity / abs(ball_x_velocity)
 
-    if paddle_dir == ball_dir:
-        ball_final_pos = ball_final(ball_pos[0], ball_pos[1], ball_vel_x, ball_vel_y)
-        paddle_placement = ball_final_pos - paddle_size[1] / 2
+    if direction == ball_dir:
+        position = position_velocity(position_ball[0], position_ball[1], ball_x_velocity, ball_y_velocity)
+        paddle_placement = position - paddle_sz[1] / 2
+        #print(position)
     else:
-        paddle_placement = 105
+        paddle_placement = 210 / 2
 
     if paddle_placement > paddle_pos[1]:
         return "down"
+
     else:
         return "up"
-        
