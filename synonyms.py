@@ -144,10 +144,10 @@ def run_similarity_test(filename, semantic_descriptors, similarity_fn):
     f.close()
     return ((tot_right / (total_cnt)) * 100.0)
 
-
-t0 = time.time()
-sem_descriptors = build_semantic_descriptors_from_files(["wp.txt" , "sw.txt"])
-print("RUNTIME YEEE: ", time.time() - t0)
-#print(sem_descriptors['i'])
-res = run_similarity_test("test.txt", sem_descriptors, cosine_similarity)
-print(res, " percentage of the guesses were correct")
+if __name__ == '__main__':
+    t0 = time.time()
+    sem_descriptors = build_semantic_descriptors_from_files(["wp.txt" , "sw.txt"])
+    print("RUNTIME YEEE: ", time.time() - t0)
+    #print(sem_descriptors['i'])
+    res = run_similarity_test("test.txt", sem_descriptors, cosine_similarity)
+    print(res, " percentage of the guesses were correct")

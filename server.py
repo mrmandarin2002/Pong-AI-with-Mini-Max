@@ -8,7 +8,7 @@ temp = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 PORT = 5555
 SERVER = ''
 FORMAT = 'utf-8'
-HEADER = 2048
+HEADER = 16
 DELAY = 0.05
 
 SERVER_IP = socket.gethostbyname(SERVER)
@@ -61,7 +61,7 @@ class Client_Thread(threading.Thread):
         sentence = ""
         current_sentence = ""
         sentences = []
-        for x in range(randint(3,10)):
+        for x in range(randint(3,8)):
             sz = len(sentence)
             y_range = randint(2, 5)
             words_in_sentence = []
@@ -125,6 +125,13 @@ class Client_Thread(threading.Thread):
             case.insert(1, synonyms.most_similar_word(case[0], case[1:], s, synonyms.cosine_similarity))
             cases += (" ".join(case) + '\n')
         return cases
+
+    def header_length(self, length):
+        temp = ""
+        while(length != HEADER - len(length)):
+            temp += '0'
+        return temp + length
+
         
     def run(self):
         cnt = 0

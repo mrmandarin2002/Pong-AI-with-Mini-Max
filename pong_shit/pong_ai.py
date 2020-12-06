@@ -484,9 +484,9 @@ def pong_ai(paddle_frect, other_paddle_frect, ball_frect, table_size):
             for idx, aim in enumerate(aim_list):
                 if(aim[2] != 0):
                     dis = min(abs((aim[0] + ball_size[1]) - enemy_pos[0]), abs(aim[0] - enemy_pos[1]))
-                    if(dis * abs(aim[2]) > max_val):
+                    if(dis > max_val):
                         if((aim[1] - ball_size[1] + 2 < ball_to_y) and time_to_paddle > abs(aim[1] - paddle_frect.pos[1])):
-                            max_val = dis * abs(aim[2])
+                            max_val = dis
                             move_to_y = aim[1]
                             temp_idx = idx
             if max_val == 0:
