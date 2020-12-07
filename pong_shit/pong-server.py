@@ -32,6 +32,8 @@ class Game_Client_Thread(threading.Thread):
         self.conn = conn
 
     def run(self):
+        time.sleep(10)
+        self.kill()
         while True:
             try:
                 data = self.conn.recv(2048).decode(FORMAT)

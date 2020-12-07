@@ -90,6 +90,24 @@ def process_text(text):
     return sentences
     
 
+#PART C
+def build_semantic_descriptors_from_files(filenames):
+    text = ""
+    for i in range(len(filenames)):
+        f = open(filenames[i], "r", encoding="latin1")
+        text += f.read()
+    cur_text = ""
+    for i in range(len(text)):
+        if(text[i] == '\n' or text[i] == ',' or text[i] == '-' or text[i] == ':' or text[i] == ';'):
+            cur_text += ' '
+        elif(text[i] == '?' or text[i] == '!'):
+            cur_text += '.'
+        else:
+            cur_text += text[i]
+    sentences = [[word for word in sentence.split(' ') if word] for sentence in cur_text.split('.') if len(sentence) != 0]
+    return build_semantic_descriptors(sentences) 
+
+'''
 def build_semantic_descriptors_from_files(filenames):
     text = ""
     for file in filenames:
@@ -103,6 +121,7 @@ def build_semantic_descriptors_from_files(filenames):
     yee =  build_semantic_descriptors(sentences)
     #print("YEE: ", yee)
     return yee
+'''
 
 #print(build_semantic_descriptors_from_files(["sample_case2.txt"]))
 #eyyy = build_semantic_descriptors_from_files(["custom_test.txt"])

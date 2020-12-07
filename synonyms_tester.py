@@ -5,7 +5,7 @@
 import socket, threading, json, contextlib, io, time
 from random import *
 
-synonyms = __import__("Project_3") #put your filename here (pls for the love of god run this shit in the same folder as your file (and for the love of jesus do not pyzo this))
+synonyms = __import__("yuxin") #put your filename here (pls for the love of god run this shit in the same folder as your file (and for the love of jesus do not pyzo this))
 
 HEADER = 16
 DELAY = 0.0 #hehehehe
@@ -31,7 +31,9 @@ class Network:
         try:
             #print(function +":" + str(data))
             self.client.send(str.encode(function +":" + str(data)))
-            while(True):
+            cnt = 0
+            while(True or cnt > 1000):
+                cnt += 1
                 try:    
                     msg_length = int(self.client.recv(HEADER).decode(FORMAT))
                     break
@@ -41,10 +43,6 @@ class Network:
             temp = ""
             while(len(temp) < msg_length):
                 temp += self.client.recv(4096).decode(FORMAT)
-                #print("IN", len(temp))
-                #print(temp)
-            #print("LENGTH OF DATA: ", len(temp))
-            print(temp)
             return temp
         except socket.error as e:
             print(str(e))

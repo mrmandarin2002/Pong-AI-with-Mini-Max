@@ -44,6 +44,7 @@ def get_i_Pi_beam(web_height, width, bent_length, horizontal_layers, web_layers)
     I += (2 * bent_length * matboard_height * (web_layers * matboard_height) ** 3) / 12
 
     print("Y:", y_bar)
+    print("I:", I)
 
     return [I, y_bar]
 
