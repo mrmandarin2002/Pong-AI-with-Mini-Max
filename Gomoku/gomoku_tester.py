@@ -1,15 +1,24 @@
-#creds to Balaji as well for making the continous analysis function!
+# hello fellow 2T5s! I'm Derek (2T4) the maker of this tester. 
+# Please make sure the filename and directory is correct (line 9)
+# Good luck 2T5s with life! Feel free to say hi (doubt anyone recognizes me) and hope this helps!
+# creds to Balaji as well for making the continous analysis function!
+
+# Contact me for issues with this tester. I'm pretty busy tho so can't guarantee I'll respond and also
+# I don't really remember the project so there's that...
+# This tester does NOT guarantee a 100% on your project! It just gives a general sense if your code is working. 
+
+# Special thanks to St. Paul's High School for hosting the server! Not that I told them but thanks anyways...
 
 import socket, threading, json, contextlib, io, time
 from random import *
 
-gomoku = __import__("gomoku") #put your filename here (pls for the love of god run this shit in the same folder as your file (and for the love of jesus do not pyzo this))
+gomoku = __import__("gomoku") #put your filename here (pls for the love of god run this shit in the same folder as your file)
 
 HEADER = 16
-DELAY = 0.0 #hehehehe
+DELAY = 0.1 #pls don't ddos me
 PORT = 5555
 FORMAT = 'utf-8'
-HOST_IP = '172.105.7.203' #hey those trying to hack my server! there ain't shit on there so gl + my gomoku server is run within a try statement so good f****** luck trying to break that shit
+HOST_IP = '35.171.50.193' #lol let's hope AWS has good security
 
 class Network:
 
